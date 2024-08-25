@@ -4,6 +4,10 @@ Subject: https://cdn.intra.42.fr/pdf/pdf/119214/en.subject.pdf
 
 Tutorial basico: https://medium.com/@afatir.ahmedfatir/small-irc-server-ft-irc-42-network-7cee848de6f9
 
+Documentação protocolo IRC: https://modern.ircdocs.horse/
+
+
+
 | Function | Prototype | Description | Library |
 |----------|-----------|-------------|-------------|
 | socket | int socket(int domain, int type, int protocol); | The socket() function shall create an unbound socket in a communications domain, and return a file descriptor that can be used in later function calls that operate on sockets. | #include <sys/socket.h> |
