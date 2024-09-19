@@ -1,6 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include "Libs.hpp"
 
 class Client //-> class for client
 {
@@ -12,18 +13,18 @@ class Client //-> class for client
 		std::string _password;
 
 	public:
-		Client(){}; //-> default constructor
+		Client(); //-> default constructor
 		~Client();
 
 		void 		setClientname(std::string clientname);
 		void 		setNickname(std::string nickname);
-		void		setIpAdd(std::string ipadd){_IPadd = ipadd;} //-> setter for ipadd
-		void		SetFd(int fd){_Fd = fd;} //-> setter for fd
-        void 		setPassword(std::string password);	
+		void		setIpAdd(std::string ipadd); //-> setter for ipadd
+		void		SetFd(int fd); //-> setter for fd
+		void 		setPassword(std::string password);	
 		std::string	getClientname();
 		std::string	getNickname();
 		std::string	getIpAdd();
-		int			GetFd(){return _Fd;} //-> getter for fd
+		int			getFd(); //-> getter for fd
 		std::string	getPassword();
 };
 

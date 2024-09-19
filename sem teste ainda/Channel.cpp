@@ -5,7 +5,7 @@ Channel::Channel(const std::string& name) : _name(name) {
 	initModes(_modes);
 	_password = "";
 	_clientCount = 0;
-	_clientLimit = 10;
+	_limit = 10;
 }
 
 Channel::~Channel() {
@@ -132,8 +132,8 @@ bool Channel::isOnChannel(const std::string userName) const {
 }
 
 void Channel::addClient(Client* Client) {
-	_clients.insert(std::make_pair(Client->getUserName(), Client));
-	incrementClientCount();
+	_clients.insert(std::make_pair(Client->getClientname(), Client));
+	increaseClientCount();
 }
 
 bool Channel::removeClient(const std::string& userName) {
@@ -143,7 +143,7 @@ bool Channel::removeClient(const std::string& userName) {
         _clients.erase(it);
 		return true;
     } else {
-		std::string response = IRC + ERR_NOTONCHANNELNBR + _name + ERR_NOTONCHANNEL + END;
+		std::cout << "This client is not on this channel!!" << std::endl;
 		return false;
     }
 }
@@ -161,18 +161,18 @@ void Channel::removeFromInviteList(const std::string userName) {
     }
 }
 
-void Channel::promoteToOperator(const std::string userName) {
-    std::map<std::string, Client*>::iterator it = _clients.find(userName);
+void Channel::promoteToOperator(const std::string clientname) {
+    std::map<std::string, Client*>::iterator it = _clients.find(clientname);
     if (it != _clients.end()) {
-        _operators[nickname] = it->second;
+        _operators[clientname] = it->second;
         _clients.erase(it);
     }
 }
 
-void Channel::demoteFromOperator(const std::string userName) {
-    std::map<std::string, Client*>::iterator it = _operators.find(userName);
+void Channel::demoteFromOperator(const std::string clientname) {
+    std::map<std::string, Client*>::iterator it = _operators.find(clientname);
     if (it != _operators.end()) {
-        _clients[nickname] = it->second;
+        _clients[clientname] = it->second;
         _operators.erase(it);
     }
 }
@@ -180,11 +180,11 @@ void Channel::demoteFromOperator(const std::string userName) {
 void Channel::listClients() const {
 	std::cout << "List of Clients:\n";
 	for (std::map<std::string, Client*>::const_iterator it = _clients.begin(); it != _clients.end(); it++)
-		std::cout << it->second->getUserName() << std::endl;
+		std::cout << it->second->getClientname() << std::endl;
 }
 
 void Channel::listOperators() const {
 	std::cout << "List of Operators:\n";
 	for (std::map<std::string, Client*>::const_iterator it = _operators.begin(); it != _operators.end(); it++)
-		std::cout << it->second->getUserName() << std::endl;
+		std::cout << it->second->getClientname() << std::endl;
 }

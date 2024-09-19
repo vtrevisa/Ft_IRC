@@ -35,7 +35,7 @@ std::string Client::getNickname() {
 std::string Client::getIpAdd() {
 	return _IPadd;
 }
-int Client::GetFd() {
+int Client::getFd() {
 	return _Fd;
 }
 
