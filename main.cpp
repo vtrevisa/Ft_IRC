@@ -1,4 +1,4 @@
-#include "irc_init.cpp"
+#include "../includes/Server.hpp"
 
 bool validateArgs(int argc, char* argv[])
 {

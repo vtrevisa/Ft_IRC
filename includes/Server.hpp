@@ -1,8 +1,6 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "Libs.hpp"
-#include "Client.hpp"
 #include "Channel.hpp"
 
 class Client;
