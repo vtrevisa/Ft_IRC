@@ -1,6 +1,7 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
+#include "Libs.hpp"
 #include "Client.hpp"
 
 class Client;
@@ -42,15 +43,15 @@ class Channel {
 		std::map<std::string, Client*>	getNonOperators() const;
 		std::string						getChannelClientsList() const;
 
-		bool							isInvited(const std::string userName) const;
-		bool							isOperator(const std::string userName) const;
-		bool							isOnChannel(const std::string userName) const;
+		bool							isInvited(const std::string clientname) const;
+		bool							isOperator(const std::string clientname) const;
+		bool							isOnChannel(const std::string clientname) const;
 		void							addClient(Client* client);
-		bool							removeClient(const std::string& userName);
-		void							addToInviteList(const std::string userName);
-		void 							removeFromInviteList(const std::string userName);
-		void							promoteToOperator(std::string userName);
-		void							demoteFromOperator(std::string userName);
+		bool							removeClient(const std::string& clientname);
+		void							addToInviteList(const std::string clientname);
+		void 							removeFromInviteList(const std::string clientname);
+		void							promoteToOperator(std::string clientname);
+		void							demoteFromOperator(std::string clientname);
 		void							listClients() const;
 		void							listOperators() const;
 };

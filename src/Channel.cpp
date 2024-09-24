@@ -1,4 +1,4 @@
-#include "../includes/Channel.hpp"
+#include "Channel.hpp"
 
 Channel::Channel(const std::string& name) : _name(name) {
 	_topic = "";
@@ -113,20 +113,20 @@ std::string Channel::getChannelClientsList() const {
 	return clientsList;
 }
 
-bool Channel::isInvited(const std::string userName) const {
+bool Channel::isInvited(const std::string clientname) const {
 	for (std::vector<std::string>::const_iterator it = _inviteList.begin(); it != _inviteList.end(); ++it)
-		if (*it == userName)
+		if (*it == clientname)
 			return true;
 	return false;
 }
 
-bool Channel::isOperator(const std::string userName) const {
-	return _operators.find(userName) != _operators.end();
+bool Channel::isOperator(const std::string clientname) const {
+	return _operators.find(clientname) != _operators.end();
 }
 
-bool Channel::isOnChannel(const std::string userName) const {
-    bool isOnChannel = (_clients.find(userName) != _clients.end());
-    bool isOperator = (_operators.find(userName) != _operators.end());
+bool Channel::isOnChannel(const std::string clientname) const {
+    bool isOnChannel = (_clients.find(clientname) != _clients.end());
+    bool isOperator = (_operators.find(clientname) != _operators.end());
 
     return isOnChannel || isOperator;
 }
@@ -136,8 +136,8 @@ void Channel::addClient(Client* Client) {
 	increaseClientCount();
 }
 
-bool Channel::removeClient(const std::string& userName) {
-    std::map<std::string, Client*>::iterator it = _clients.find(userName);
+bool Channel::removeClient(const std::string& clientname) {
+    std::map<std::string, Client*>::iterator it = _clients.find(clientname);
 
     if (it != _clients.end()) {
         _clients.erase(it);
@@ -148,13 +148,13 @@ bool Channel::removeClient(const std::string& userName) {
     }
 }
 
-void Channel::addToInviteList(const std::string userName) {
-    _inviteList.push_back(userName);
+void Channel::addToInviteList(const std::string clientname) {
+    _inviteList.push_back(clientname);
 }
 
-void Channel::removeFromInviteList(const std::string userName) {
+void Channel::removeFromInviteList(const std::string clientname) {
     for (std::vector<std::string>::iterator it = _inviteList.begin(); it != _inviteList.end(); ++it) {
-        if (*it == userName) {
+        if (*it == clientname) {
             _inviteList.erase(it);
             break;
         }
