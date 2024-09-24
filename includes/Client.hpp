@@ -16,6 +16,8 @@ class Client //-> class for client
 		Client(); //-> default constructor
 		~Client();
 
+		std::string	clientBuff;
+
 		void 		setClientname(std::string clientname);
 		void 		setNickname(std::string nickname);
 		void		setIpAdd(std::string ipadd); //-> setter for ipadd
