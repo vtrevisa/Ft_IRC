@@ -1,9 +1,8 @@
-#include "../includes/Server.hpp"
+#include "Server.hpp"
 
 Server::Server() {_SerSocketFd = -1;}
 		
 Server::~Server() {}
-
 
 void Server::ServerInit(int port, std::string passwd) {
 	this->_Port = port;
@@ -97,41 +96,24 @@ void Server::AcceptNewClient() {
 void Server::ReceiveNewData(int fd) {
 	char buff[1024]; //-> buffer for the received data
 	memset(buff, 0, sizeof(buff)); //-> clear the buffer
+	Client* client = getClientByFD(fd);
 
 	ssize_t bytes = recv(fd, buff, 1023, 0); //-> receive the data
 
-	if(bytes <= 0) { //-> check if the client disconnected
+	if (bytes <= 0) { //-> check if the client disconnected
 		std::cout << RED << "Client <" << fd << "> Disconnected" << WHI << std::endl;
+		client->clientBuff.clear();
 		ClearClients(fd); //-> clear the client
 		close(fd); //-> close the client socket
-	} else { //-> print the received data
-		buff[bytes] = '\0';
-		std::cout << YEL << "Client <" << fd << "> Data: " << WHI << buff;
-		//here you can add your code to process the received data: parse, check, authenticate, handle the command, etc...
+		return;
 	}
+	client->clientBuff.append(buff);
+
+	if (client->clientBuff.find("\n") == std::string::npos)
+		return;
+
+	Server::identifyCommand(client->clientBuff, fd);
 }
-
-// void Server::ReceiveNewData(int fd) {
-// 	char buff[1024]; //-> buffer for the received data
-// 	memset(buff, 0, sizeof(buff)); //-> clear the buffer
-// 	Client* client = getClientByFD(fd);
-
-// 	ssize_t bytes = recv(fd, buff, 1023, 0); //-> receive the data
-
-// 	if (bytes <= 0) { //-> check if the client disconnected
-// 		std::cout << RED << "Client <" << fd << "> Disconnected" << WHI << std::endl;
-// 		client->clientBuff.clear();
-// 		ClearClients(fd); //-> clear the client
-// 		close(fd); //-> close the client socket
-// 		return;
-// 	}
-// 	client->clientBuff.append(buff);
-
-// 	if (client->clientBuff.find("\n") == std::string::npos)
-// 		return;
-
-// 	Server::identifyCommand(client->clientBuff, fd);
-// }
 
 bool Server::_Signal = false; //-> initialize the static boolean
 void Server::SignalHandler(int signum) {
@@ -173,10 +155,18 @@ Client* Server::getClientByFD(int fd) {
 	return NULL;
 }
 
+Client* Server::getClientByNick(std::string nickName) {
+	for (size_t i = 0; i < _clients.size(); i++)
+		if (_clients[i].getNickname() == nickName)
+			return &_clients[i];
+	return NULL;
+}
+
 Channel* Server::getChannel(const std::string& channelName) {
-	for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
-		if (it->getName() == channelName)
-			return &(*it);
+    for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
+        if (it->getName() == channelName)
+            return &(*it);
+	}
 	return NULL;
 }
 
@@ -196,7 +186,7 @@ void Server::deleteChannel(std::string channelName) {
 	if (_channels.empty())
 		return;
 
-	for(size_t i = 0; i < _channels.size(); i++) {
+	for (size_t i = 0; i < _channels.size(); i++) {
 		if (_channels[i].getName() == channelName) {
 			_channels.erase(_channels.begin() + i);
 			break;
@@ -204,84 +194,74 @@ void Server::deleteChannel(std::string channelName) {
 	}
 }
 
-// std::vector<std::string> splitstr(std::string string) {
-// 	std::vector<std::string> splittedStr;
-// 	std::string word;
-// 	std::stringstream ss(string);
+std::vector<std::string> splitstr(std::string string) {
+	std::vector<std::string> splittedStr;
+	std::string word;
+	std::stringstream ss(string);
 
-// 	while (!ss.eof() && std::getline(ss, word, '\n'))
-// 		splittedStr.push_back(word);
+	while (!ss.eof() && std::getline(ss, word, '\n'))
+		splittedStr.push_back(word);
 
-// 	return splittedStr;
-// }
+	return splittedStr;
+}
 
-// void Server::identifyCommand(std::string& string, int fd) {
-// 	std::vector<std::string> splittedStr = splitstr(string);
-// 	Client* client = Server::getClientByFD(fd);
-// 	std::string requests[] = {    comando    }; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
+void Server::identifyCommand(std::string& string, int fd) {
+	std::vector<std::string> splittedStr = splitstr(string);
+	Client* client = Server::getClientByFD(fd);
+	std::string requests[] = {"mode"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
 
-// 	do {
-// 		int i = 0;
-// 		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));
-// 		std::cout << "message: " << string << std::endl;
-// 		std::cout << "client: " << fd << std::endl;
+	do {
+		int i = 0;
+		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));
+		std::cout << "message: " << string << std::endl;
+		std::cout << "client: " << fd << std::endl;
 
-// 		//loop que vai identificar o comando
-// 		for (; i < XXXX; i++) //substituir XXXX pelo numero de comandos totais descritos acima
-// 			if(command == requests[i])
-// 				break;
-
-
-// 		std::string parsedCommand = splittedStr[0].substr(splittedStr[0].find_first_of(" ") + 1);
-
-// 		//cada comando vai ser um case diferente, então é só chamar o método correspondente em cada caso
-// 		//ex: case 0:
-// 		//kick(parseCommand(parsedCommand), ...); break;
-// 		//case 1:
-// 		//join(parseCommand(parsedCommand), ...); break;
-// 		switch (i) {
-// 			case 0:
-				
-// 				break;
-// 			case 1:
-				
-// 				break;
-// 			case 2:
-				
-// 				break;
-// 			case 3:
-				
-// 				break;
-// 			default:
-// 				unknownCommand(command, fd);
-// 				break;
-// 		}
-// 		splittedStr.erase(splittedStr.begin());
-// 	} while (!splittedStr.empty());
-
-// 	client->clientBuff.clear();
-// }
-
-// std::vector<std::string> Server::parseCommand(std::string string) {
-// 	std::string word;
-// 	std::stringstream ss(string);
-// 	std::vector<std::string> splittedVector;
-
-// 	while (std::getline(ss, word, ' ')) {
-// 		if (word.find('\r') != std::string::npos)
-// 			splittedVector.push_back(word.substr(0, word.find('\r')));
-// 		else
-// 			splittedVector.push_back(word);
-// 	}
-// 	if (splittedVector.size() == 0)
-// 		splittedVector.push_back("");
-
-// 	return splittedVector;
-// }
+		//loop que vai identificar o comando
+		for (; i < 1; i++) //substituir XXXX pelo numero de comandos totais descritos acima
+			if(command == requests[i])
+				break;
 
 
-// void Server::unknownCommand(std::string command, int fd) {
-// 	std::string response = command + ": Unknown command\r\n";
-// 	if(send(fd, response.c_str(), response.size(), 0) == -1)
-// 		std::cerr << "Error sending message" << std::endl;
-// }
+		std::string parsedCommand = splittedStr[0].substr(splittedStr[0].find_first_of(" ") + 1);
+
+		//cada comando vai ser um case diferente, então é só chamar o método correspondente em cada caso
+		//ex: case 0:
+		//kick(parseCommand(parsedCommand), ...); break;
+		//case 1:
+		//join(parseCommand(parsedCommand), ...); break;
+		switch (i) {
+			case 0:
+				mode(parseCommand(parsedCommand), fd);
+				break;
+			default:
+				unknownCommand(command, fd);
+				break;
+		}
+		splittedStr.erase(splittedStr.begin());
+	} while (!splittedStr.empty());
+
+	client->clientBuff.clear();
+}
+
+std::vector<std::string> Server::parseCommand(std::string string) {
+	std::string word;
+	std::stringstream ss(string);
+	std::vector<std::string> splittedVector;
+
+	while (std::getline(ss, word, ' ')) {
+		if (word.find('\r') != std::string::npos)
+			splittedVector.push_back(word.substr(0, word.find('\r')));
+		else
+			splittedVector.push_back(word);
+	}
+	if (splittedVector.size() == 0)
+		splittedVector.push_back("");
+
+	return splittedVector;
+}
+
+void Server::unknownCommand(std::string command, int fd) {
+	std::string response = command + ": Unknown command\r\n";
+	if(send(fd, response.c_str(), response.size(), 0) == -1)
+		std::cerr << "Error sending message" << std::endl;
+}

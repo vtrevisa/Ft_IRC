@@ -24,9 +24,9 @@ class Channel {
 
 		void							initModes(std::map<std::string, bool>& modes);
 
-		void							setName(const std::string& name);
-		void							setTopic(const std::string& topic);
-		void							setPassword(std::string& password);
+		void							setName(const std::string name);
+		void							setTopic(const std::string topic);
+		void							setPassword(std::string password);
 		void							setMode(std::string mode, bool value);
 		void							setLimit(int limit);
 		void							increaseClientCount();

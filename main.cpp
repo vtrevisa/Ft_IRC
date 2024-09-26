@@ -1,4 +1,4 @@
-#include "includes/Server.hpp"
+#include "Server.hpp"
 
 bool validateArgs(int argc, char* argv[])
 {

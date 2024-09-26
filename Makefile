@@ -1,7 +1,7 @@
 #----SPECIFICS---------------------------------------------------------------------------------
 
 NAME = ft_irc
-SRC = main.cpp Server.cpp Client.cpp Channel.cpp
+SRC = main.cpp Server.cpp Client.cpp Channel.cpp mode.cpp
 
 #----DIRS--------------------------------------------------------------------------------------
 OBJ_DIR = obj
