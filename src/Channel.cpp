@@ -62,7 +62,10 @@ std::string Channel::getPassword() const {
 }
 
 bool Channel::getMode(std::string mode) const {
-	return this->_modes.at(mode);
+	std::map<std::string, bool>::const_iterator it = _modes.find(mode);
+	if (it != _modes.end())
+		return it->second;
+	return false;
 }
 
 int Channel::getLimit() const {
@@ -113,20 +116,20 @@ std::string Channel::getChannelClientsList() const {
 	return clientsList;
 }
 
-bool Channel::isInvited(const std::string clientname) const {
+bool Channel::isInvited(const std::string nickname) const {
 	for (std::vector<std::string>::const_iterator it = _inviteList.begin(); it != _inviteList.end(); ++it)
-		if (*it == clientname)
+		if (*it == nickname)
 			return true;
 	return false;
 }
 
-bool Channel::isOperator(const std::string clientname) const {
-	return _operators.find(clientname) != _operators.end();
+bool Channel::isOperator(const std::string nickname) const {
+	return _operators.find(nickname) != _operators.end();
 }
 
-bool Channel::isOnChannel(const std::string clientname) const {
-    bool isOnChannel = (_clients.find(clientname) != _clients.end());
-    bool isOperator = (_operators.find(clientname) != _operators.end());
+bool Channel::isOnChannel(const std::string nickname) const {
+    bool isOnChannel = (_clients.find(nickname) != _clients.end());
+    bool isOperator = (_operators.find(nickname) != _operators.end());
     return isOnChannel || isOperator;
 }
 
@@ -135,8 +138,8 @@ void Channel::addClient(Client* Client) {
 	increaseClientCount();
 }
 
-bool Channel::removeClient(const std::string& clientname) {
-    std::map<std::string, Client*>::iterator it = _clients.find(clientname);
+bool Channel::removeClient(const std::string& nickname) {
+    std::map<std::string, Client*>::iterator it = _clients.find(nickname);
 
     if (it != _clients.end()) {
         _clients.erase(it);
@@ -147,43 +150,43 @@ bool Channel::removeClient(const std::string& clientname) {
     }
 }
 
-void Channel::addToInviteList(const std::string clientname) {
-    _inviteList.push_back(clientname);
+void Channel::addToInviteList(const std::string nickname) {
+    _inviteList.push_back(nickname);
 }
 
-void Channel::removeFromInviteList(const std::string clientname) {
+void Channel::removeFromInviteList(const std::string nickname) {
     for (std::vector<std::string>::iterator it = _inviteList.begin(); it != _inviteList.end(); ++it) {
-        if (*it == clientname) {
+        if (*it == nickname) {
             _inviteList.erase(it);
             break;
         }
     }
 }
 
-void Channel::promoteToOperator(const std::string clientname) {
-    std::map<std::string, Client*>::iterator it = _clients.find(clientname);
+void Channel::promoteToOperator(const std::string nickname) {
+    std::map<std::string, Client*>::iterator it = _clients.find(nickname);
     if (it != _clients.end()) {
-        _operators[clientname] = it->second;
+        _operators[nickname] = it->second;
         _clients.erase(it);
     }
 }
 
-void Channel::demoteFromOperator(const std::string clientname) {
-    std::map<std::string, Client*>::iterator it = _operators.find(clientname);
+void Channel::demoteFromOperator(const std::string nickname) {
+    std::map<std::string, Client*>::iterator it = _operators.find(nickname);
     if (it != _operators.end()) {
-        _clients[clientname] = it->second;
+        _clients[nickname] = it->second;
         _operators.erase(it);
     }
 }
 
 void Channel::listClients() const {
-	std::cout << "List of Clients:\n";
+	std::cout << "List of Clients:\r\n";
 	for (std::map<std::string, Client*>::const_iterator it = _clients.begin(); it != _clients.end(); it++)
 		std::cout << it->second->getNickname() << std::endl;
 }
 
 void Channel::listOperators() const {
-	std::cout << "List of Operators:\n";
+	std::cout << "List of Operators:\r\n";
 	for (std::map<std::string, Client*>::const_iterator it = _operators.begin(); it != _operators.end(); it++)
 		std::cout << it->second->getNickname() << std::endl;
 }

@@ -9,14 +9,14 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 	//verifica se o canal existe no server
 	if (channel == NULL) {
-		response = "Channel does not exist\n";
+		response = "Channel does not exist\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	//verifica se o usuário é um operador
 	if (!channel->isOperator(client->getNickname())) {
-		response = "You don't have operator privileges on this channel\n";
+		response = "You don't have operator privileges on this channel\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -24,7 +24,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 	//verifica se o usuário enviou um modo para alterar, caso não tenha enviado, retorna a lista de modos ativos no canal
 	if (string.size() == 1 || string[1] == "") {
 		std::string modes = channel->getAllModes();
-		response = "Modes in this channel: "+ modes + "\n";
+		response = "Modes in this channel: "+ modes + "\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -72,7 +72,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 5:			
 			if (modeArg == "") {
-				response = "You must provide a password to be set\nUsage: /mode +k <password>\n";
+				response = "You must provide a password to be set\r\nUsage: /mode +k <password>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -83,19 +83,19 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 6:
 			if (modeArg == "") {
-				response = "You must provide a client to be demoted\nUsage: /mode -o <nickname>\n";
+				response = "You must provide a client to be demoted\r\nUsage: /mode -o <nickname>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (clientArg == NULL) {
-				response = "This client is not on this channel\n";
+				response = "This client is not on this channel\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (!channel->isOperator(clientArg->getNickname())) {
-				response = "This client is not an operator on this channel\n";
+				response = "This client is not an operator on this channel\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -106,19 +106,19 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 7:
 			if (modeArg == "") {
-				response = "You must provide a client to be promoted\nUsage: /mode +o <nickname>\n";
+				response = "You must provide a client to be promoted\r\nUsage: /mode +o <nickname>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (clientArg == NULL) {
-				response = "This client is not on this channel\n";
+				response = "This client is not on this channel\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (channel->isOperator(clientArg->getNickname())) {
-				response = "This client is already an operator on this channel\n";
+				response = "This client is already an operator on this channel\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -135,7 +135,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 9:
 			if (modeArg == "") {
-				response = "You must provide a limit to be set\nUsage: /mode +l <limit>\n";
+				response = "You must provide a limit to be set\r\nUsage: /mode +l <limit>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -147,10 +147,10 @@ void Server::mode(std::vector<std::string> string, int fd) {
 			break;
 
 		default:
-			response = "Invalid mode\n";
+			response = "Invalid mode\r\n";
 			break;
 	}
 
-	response += mode + " " + modeArg + "\n";
+	response += mode + " " + modeArg + "\r\n";
 	send(fd, response.c_str(), response.size(), 0);
 }

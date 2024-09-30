@@ -244,7 +244,7 @@ std::vector<std::string> splitstr(std::string string) {
 void Server::identifyCommand(std::string& string, int fd) {
 	std::vector<std::string> splittedStr = splitstr(string);
 	Client* client = Server::getClientByFD(fd);
-	std::string requests[] = {"mode", "exit"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
+	std::string requests[] = {"mode", "exit", "invite"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
 
 	do {
 		int i = 0;
@@ -253,7 +253,7 @@ void Server::identifyCommand(std::string& string, int fd) {
 		std::cout << "client: " << fd << std::endl;
 
 		//loop que vai identificar o comando
-		for (; i < 2; i++) //substituir XXXX pelo numero de comandos totais descritos acima
+		for (; i < 3; i++) //substituir XXXX pelo numero de comandos totais descritos acima
 			if(command == requests[i])
 				break;
 
@@ -265,19 +265,23 @@ void Server::identifyCommand(std::string& string, int fd) {
 		//kick(parseCommand(parsedCommand), ...); break;
 		//case 1:
 		//join(parseCommand(parsedCommand), ...); break;
+		std::string response;
 		switch (i) {
 			case 0:
 				mode(parseCommand(parsedCommand), fd);
 				break;
-			default:
-				unknownCommand(command, fd);
-				break;
 			case 1:
-				std::string response = "Goodbye!\r\n";
+				response = "Goodbye!\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				std::cout << RED << "Client <" << fd << "> Disconnected" << WHI << std::endl;
 				close(fd);
 				ClearClients(fd);
+				break;
+			case 2:
+				invite(parseCommand(parsedCommand), fd);
+				break;
+			default:
+				unknownCommand(command, fd);
 				break;
 		}
 		splittedStr.erase(splittedStr.begin());

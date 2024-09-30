@@ -43,15 +43,15 @@ class Channel {
 		std::map<std::string, Client*>	getNonOperators() const;
 		std::string						getChannelClientsList() const;
 
-		bool							isInvited(const std::string clientname) const;
-		bool							isOperator(const std::string clientname) const;
-		bool							isOnChannel(const std::string clientname) const;
+		bool							isInvited(const std::string nickname) const;
+		bool							isOperator(const std::string nickname) const;
+		bool							isOnChannel(const std::string nickname) const;
 		void							addClient(Client* client);
-		bool							removeClient(const std::string& clientname);
-		void							addToInviteList(const std::string clientname);
-		void 							removeFromInviteList(const std::string clientname);
-		void							promoteToOperator(std::string clientname);
-		void							demoteFromOperator(std::string clientname);
+		bool							removeClient(const std::string& nickname);
+		void							addToInviteList(const std::string nickname);
+		void 							removeFromInviteList(const std::string nickname);
+		void							promoteToOperator(std::string nickname);
+		void							demoteFromOperator(std::string nickname);
 		void							listClients() const;
 		void							listOperators() const;
 };
