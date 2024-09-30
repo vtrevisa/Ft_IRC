@@ -3,6 +3,11 @@
 
 #include "Libs.hpp"
 
+typedef enum {
+	UNAUTHORIZED,
+	CONNECTED,
+	OPERATOR
+} status;
 class Client //-> class for client
 {
 	private:
@@ -11,6 +16,7 @@ class Client //-> class for client
 		std::string	_nickname;
 		std::string	_clientname;
 		std::string _password;
+		status		_status;
 
 	public:
 		Client(); //-> default constructor
@@ -22,11 +28,13 @@ class Client //-> class for client
 		void 		setNickname(std::string nickname);
 		void		setIpAdd(std::string ipadd); //-> setter for ipadd
 		void		SetFd(int fd); //-> setter for fd
-		void 		setPassword(std::string password);	
+		void 		setPassword(std::string password);
+		void		setStatus(status status);
 		std::string	getClientname();
 		std::string	getNickname();
 		std::string	getIpAdd();
 		int			getFd(); //-> getter for fd
+		status		getStatus();
 		std::string	getPassword();
 };
 

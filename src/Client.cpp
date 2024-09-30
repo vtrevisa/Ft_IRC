@@ -1,6 +1,6 @@
-#include "Client.hpp"
+#include "../includes/Client.hpp"
 
-Client::Client() {}
+Client::Client() : _status(UNAUTHORIZED){}
 
 Client::~Client() {}
 
@@ -24,6 +24,10 @@ void Client::setPassword(std::string password) {
 	_password = password;
 }
 
+void Client::setStatus(status status) {
+	_status = status;
+}
+
 std::string Client::getClientname() {
 	return _clientname;
 }
@@ -41,4 +45,8 @@ int Client::getFd() {
 
 std::string Client::getPassword() {
 	return _password;
+}
+
+status Client::getStatus() {
+	return _status;
 }

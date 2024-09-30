@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 
 Server::Server() {_SerSocketFd = -1;}
 		
@@ -21,6 +21,8 @@ void Server::ServerInit(int port, std::string passwd) {
 			if (_fds[i].revents & POLLIN) { //-> check if there is data to read
 				if (_fds[i].fd == _SerSocketFd)
 					AcceptNewClient(); //-> accept new client
+				else if (getClientByFD(_fds[i].fd)->getStatus() == UNAUTHORIZED)
+					Authentication(getClientByFD(_fds[i].fd)); //-> authenticate the client
 				else
 					ReceiveNewData(_fds[i].fd); //-> receive new data from a registered client
 			}
@@ -90,7 +92,38 @@ void Server::AcceptNewClient() {
 	_clients.push_back(cli); //-> add the client to the vector of clients
 	_fds.push_back(NewPoll); //-> add the client socket to the pollfd
 
-	std::cout << GRE << "Client <" << incofd << "> Connected" << WHI << std::endl; // Accept the client
+	std::cout << YEL << "Client <" << incofd << "> requested connection" << WHI << std::endl; // Accept the client
+	std::string passwordRequest = "Please enter the password:\r\n";
+	send(incofd, passwordRequest.c_str(), passwordRequest.size(), 0);
+}
+
+void Server::Authentication(Client* client)
+{
+	char buffer[1024];
+	memset(buffer, 0, sizeof(buffer));
+
+	ssize_t bytes = recv(client->getFd(), buffer, sizeof(buffer) - 1, 0);
+	if (bytes <= 0) {
+		std::cerr << "Error receiving password from client" << std::endl;
+		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHI << std::endl;
+		return;
+	}
+
+	std::string receivedPassword(buffer);
+	receivedPassword = receivedPassword.substr(0, receivedPassword.find(10));
+
+	if (receivedPassword == this->_passwd) {
+		client->setStatus(CONNECTED);
+		std::cout << GRE << "Client <" << client->getFd() << "> Connected!" << WHI << std::endl;
+		std::string response = "Password accepted!\r\n";
+		send(client->getFd(), response.c_str(), response.size(), 0);
+	} else {
+		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHI << std::endl;
+		std::string response = "Password incorrect!\r\n";
+		send(client->getFd(), response.c_str(), response.size(), 0);
+		close(client->getFd());
+		ClearClients(client->getFd());
+	}
 }
 
 void Server::ReceiveNewData(int fd) {
@@ -112,7 +145,10 @@ void Server::ReceiveNewData(int fd) {
 	if (client->clientBuff.find("\n") == std::string::npos)
 		return;
 
-	Server::identifyCommand(client->clientBuff, fd);
+	if (buff[0] == '/')
+		Server::identifyCommand(client->clientBuff, fd);
+	else
+		std::cout << "Client <" << fd << "> says: " << buff << std::endl;
 }
 
 bool Server::_Signal = false; //-> initialize the static boolean
@@ -208,7 +244,7 @@ std::vector<std::string> splitstr(std::string string) {
 void Server::identifyCommand(std::string& string, int fd) {
 	std::vector<std::string> splittedStr = splitstr(string);
 	Client* client = Server::getClientByFD(fd);
-	std::string requests[] = {"mode"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
+	std::string requests[] = {"mode", "exit"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
 
 	do {
 		int i = 0;
@@ -217,7 +253,7 @@ void Server::identifyCommand(std::string& string, int fd) {
 		std::cout << "client: " << fd << std::endl;
 
 		//loop que vai identificar o comando
-		for (; i < 1; i++) //substituir XXXX pelo numero de comandos totais descritos acima
+		for (; i < 2; i++) //substituir XXXX pelo numero de comandos totais descritos acima
 			if(command == requests[i])
 				break;
 
@@ -235,6 +271,13 @@ void Server::identifyCommand(std::string& string, int fd) {
 				break;
 			default:
 				unknownCommand(command, fd);
+				break;
+			case 1:
+				std::string response = "Goodbye!\r\n";
+				send(fd, response.c_str(), response.size(), 0);
+				std::cout << RED << "Client <" << fd << "> Disconnected" << WHI << std::endl;
+				close(fd);
+				ClearClients(fd);
 				break;
 		}
 		splittedStr.erase(splittedStr.begin());
