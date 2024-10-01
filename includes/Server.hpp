@@ -49,6 +49,7 @@ class Server //-> class for server
 		//comandos
 		void						mode(std::vector<std::string> string, int fd);
 		void						invite(std::vector<std::string> string, int fd);
+		void						kick(std::vector<std::string> string, int fd);
 };
 
 #endif
