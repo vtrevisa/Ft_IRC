@@ -47,9 +47,19 @@ class Server //-> class for server
 		void						unknownCommand(std::string command, int fd);
 
 		//comandos
-		void						mode(std::vector<std::string> string, int fd);
-		void						invite(std::vector<std::string> string, int fd);
-		void						kick(std::vector<std::string> string, int fd);
+		void						mode(std::vector<std::string> string, int fd); //done
+		void						invite(std::vector<std::string> string, int fd); //done
+		void						topic();
+		void						kick(std::vector<std::string> string, int fd); //done
+		void						join();
+		void						exit(int fd); //done
+		void						channel();
+		void						promote(int fd);
+		void						demote(int fd);
+		void						help(std::string* commands, int fd);
+		void						nickname(std::vector<std::string> nick, int fd);
+		void						username(std::vector<std::string> user, int fd);
+		void						pmsg(std::vector<std::string> msg, int fd);
 };
 
 #endif

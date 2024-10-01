@@ -1,7 +1,7 @@
 #----SPECIFICS---------------------------------------------------------------------------------
 
 NAME = ft_irc
-SRC = main.cpp Server.cpp Client.cpp Channel.cpp mode.cpp invite.cpp kick.cpp
+SRC = main.cpp Server.cpp Client.cpp Channel.cpp mode.cpp invite.cpp kick.cpp ExitHelp.cpp
 
 #----DIRS--------------------------------------------------------------------------------------
 OBJ_DIR = obj
@@ -12,7 +12,7 @@ VPATH = ./src
 #----FLAGS-------------------------------------------------------------------------------------
 
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98 -I $(INC_DIR)
+CFLAGS = -g -Wall -Wextra -Werror -std=c++98 -I $(INC_DIR)
 
 #----OBECTS------------------------------------------------------------------------------------
 

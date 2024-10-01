@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 
 void Server::invite(std::vector<std::string> string, int fd) {
 	std::string response;

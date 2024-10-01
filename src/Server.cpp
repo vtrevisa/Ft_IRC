@@ -241,10 +241,23 @@ std::vector<std::string> splitstr(std::string string) {
 	return splittedStr;
 }
 
-void Server::identifyCommand(std::string& string, int fd) {
+void Server::identifyCommand(std::string& string, int fd)
+{
 	std::vector<std::string> splittedStr = splitstr(string);
 	Client* client = Server::getClientByFD(fd);
-	std::string requests[] = {"mode", "exit", "invite"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
+	std::string requests[] = {"/mode",
+							  "/invite",
+							  "/topic",
+							  "/kick",
+							  "/join",
+							  "/exit",
+							  "/channel",
+							  "/promote",
+							  "/demote",
+							  "/help",
+							  "/nickname",
+							  "/username",
+							  "/pmsg"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
 
 	do {
 		int i = 0;
@@ -253,7 +266,7 @@ void Server::identifyCommand(std::string& string, int fd) {
 		std::cout << "client: " << fd << std::endl;
 
 		//loop que vai identificar o comando
-		for (; i < 3; i++) //substituir XXXX pelo numero de comandos totais descritos acima
+		for (; i < 13; i++) //substituir XXXX pelo numero de comandos totais descritos acima
 			if(command == requests[i])
 				break;
 
@@ -271,17 +284,43 @@ void Server::identifyCommand(std::string& string, int fd) {
 				mode(parseCommand(parsedCommand), fd);
 				break;
 			case 1:
-				response = "Goodbye!\r\n";
-				send(fd, response.c_str(), response.size(), 0);
-				std::cout << RED << "Client <" << fd << "> Disconnected" << WHI << std::endl;
-				close(fd);
-				ClearClients(fd);
-				break;
-			case 2:
 				invite(parseCommand(parsedCommand), fd);
 				break;
+			case 2:
+				//topic();
+				break;
+			case 3:
+				kick(parseCommand(parsedCommand), fd);
+				break;
+			case 4:
+				//join();
+				break;
+			case 5:
+				exit(fd);
+				break;
+			case 6:
+				//channel();
+				break;
+			case 7:
+				//promote(fd);
+				break;
+			case 8:
+				//demote(fd);
+				break;
+			case 9:
+				help(requests, fd);
+				break;
+			case 10:
+				nickname(parseCommand(parsedCommand), fd);
+				break;
+			case 11:
+				//username(parseCommand(parsedCommand), fd);
+				break;
+			case 12:
+				//pmsg(parseCommand(parsedCommand), fd);
+				break;
 			default:
-				unknownCommand(command, fd);
+				//unknownCommand(command, fd);
 				break;
 		}
 		splittedStr.erase(splittedStr.begin());
