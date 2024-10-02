@@ -1,8 +1,7 @@
-#include "../includes/Server.hpp"
+#include "Server.hpp"
 
 void Server::invite(std::vector<std::string> string, int fd) {
 	std::string response;
-	Client* client = getClientByFD(fd);
 
 	//verifica se os parametros estão vazios
 	if (string.size() == 0 || string[0] == "") {
@@ -11,6 +10,7 @@ void Server::invite(std::vector<std::string> string, int fd) {
 		return;
 	}
 
+	Client* client = getClientByFD(fd);
 	Channel* channel = getChannel(string[1]);
 	const std::string& channelName = string[1];
 

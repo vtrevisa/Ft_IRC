@@ -1,4 +1,4 @@
-#include "../includes/Server.hpp"
+#include "Server.hpp"
 
 void Server::mode(std::vector<std::string> string, int fd) {
 	std::string response;
@@ -32,7 +32,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 	int i = 0;
 	std::string modes[] = {"-i", "+i", "-t", "+t", "-k", "+k", "-o", "+o", "-l", "+l"};
 	std::string mode;
-	mode = string[1].substr(0, string[1].find('\r'));
+	mode = string[1];
 	std::string modeArg = "";
 	if (string.size() > 2)
 		modeArg = string[2];
@@ -72,7 +72,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 5:			
 			if (modeArg == "") {
-				response = "You must provide a password to be set\r\nUsage: /mode +k <password>\r\n";
+				response = "You must provide a password to be set\r\nUsage: /mode <channel name> +k <password>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -83,7 +83,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 6:
 			if (modeArg == "") {
-				response = "You must provide a client to be demoted\r\nUsage: /mode -o <nickname>\r\n";
+				response = "You must provide a client to be demoted\r\nUsage: /mode <channel name> -o <nickname>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -106,7 +106,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 7:
 			if (modeArg == "") {
-				response = "You must provide a client to be promoted\r\nUsage: /mode +o <nickname>\r\n";
+				response = "You must provide a client to be promoted\r\nUsage: /mode <channel name> +o <nickname>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -129,13 +129,13 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 8:
 			channel->setMode("l", false);
-			channel->setLimit(-1);
+			channel->setLimit(1000);
 			response += "-l";
 			break;
 
 		case 9:
 			if (modeArg == "") {
-				response = "You must provide a limit to be set\r\nUsage: /mode +l <limit>\r\n";
+				response = "You must provide a limit to be set\r\nUsage: /mode <channel name> +l <limit>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -151,6 +151,10 @@ void Server::mode(std::vector<std::string> string, int fd) {
 			break;
 	}
 
+	std::vector<Client *> clients = channel->getAllClients();
+	response = client->getNickname() + " has set this channel topic to: " + channel->getTopic();
+	for (size_t i = 0; i < clients.size(); i++)
+		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 	response += mode + " " + modeArg + "\r\n";
 	send(fd, response.c_str(), response.size(), 0);
 }

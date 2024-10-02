@@ -1,4 +1,4 @@
-#include "../includes/Server.hpp"
+#include "Server.hpp"
 
 Server::Server() {_SerSocketFd = -1;}
 		
@@ -252,8 +252,6 @@ void Server::identifyCommand(std::string& string, int fd)
 							  "/join",
 							  "/exit",
 							  "/channel",
-							  "/promote",
-							  "/demote",
 							  "/help",
 							  "/nickname",
 							  "/username",
@@ -266,7 +264,7 @@ void Server::identifyCommand(std::string& string, int fd)
 		std::cout << "client: " << fd << std::endl;
 
 		//loop que vai identificar o comando
-		for (; i < 13; i++) //substituir XXXX pelo numero de comandos totais descritos acima
+		for (; i < 11; i++) //substituir XXXX pelo numero de comandos totais descritos acima
 			if(command == requests[i])
 				break;
 
@@ -287,40 +285,40 @@ void Server::identifyCommand(std::string& string, int fd)
 				invite(parseCommand(parsedCommand), fd);
 				break;
 			case 2:
-				//topic();
+				topic(parseCommand(parsedCommand), fd);
 				break;
 			case 3:
 				kick(parseCommand(parsedCommand), fd);
 				break;
 			case 4:
-				//join();
+				join(parseCommand(parsedCommand), fd);
 				break;
-			case 5:
-				exit(fd);
-				break;
-			case 6:
-				//channel();
-				break;
-			case 7:
-				//promote(fd);
-				break;
-			case 8:
-				//demote(fd);
-				break;
-			case 9:
-				help(requests, fd);
-				break;
-			case 10:
-				nickname(parseCommand(parsedCommand), fd);
-				break;
-			case 11:
-				//username(parseCommand(parsedCommand), fd);
-				break;
-			case 12:
-				//pmsg(parseCommand(parsedCommand), fd);
-				break;
+			// case 5:
+			// 	exit(fd);
+			// 	break;
+			// case 6:
+			// 	//channel();
+			// 	break;
+			// case 7:
+			// 	//promote(fd);
+			// 	break;
+			// case 8:
+			// 	//demote(fd);
+			// 	break;
+			// case 9:
+			// 	help(requests, fd);
+			// 	break;
+			// case 10:
+			// 	nickname(parseCommand(parsedCommand), fd);
+			// 	break;
+			// case 11:
+			// 	//username(parseCommand(parsedCommand), fd);
+			// 	break;
+			// case 12:
+			// 	//pmsg(parseCommand(parsedCommand), fd);
+			// 	break;
 			default:
-				//unknownCommand(command, fd);
+				unknownCommand(command, fd);
 				break;
 		}
 		splittedStr.erase(splittedStr.begin());

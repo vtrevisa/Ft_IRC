@@ -1,13 +1,13 @@
-#include "../includes/Server.hpp"
+#include "Server.hpp"
 
-void	Server::exit(int fd)
-{
-	std::string response = "Goodbye!\r\n";
-	send(fd, response.c_str(), response.size(), 0);
-	std::cout << RED << "Client <" << fd << "> Disconnected" << WHI << std::endl;
-	close(fd);
-	ClearClients(fd);
-}
+// void	Server::exit(int fd)
+// {
+// 	std::string response = "Goodbye!\r\n";
+// 	send(fd, response.c_str(), response.size(), 0);
+// 	std::cout << RED << "Client <" << fd << "> Disconnected" << WHI << std::endl;
+// 	close(fd);
+// 	ClearClients(fd);
+// }
 
 /* void	Server::join()
 {
@@ -29,40 +29,40 @@ void	Server::exit(int fd)
 	std::cout << "Demote" << std::endl;
 } */
 
-void	Server::help(std::string* commands, int fd)
-{
-	std::string response = "Available commands:\r\n";
-	for (int i = 0; i < 13; i++)
-		response += commands[i] + "\r\n";
-	send(fd, response.c_str(), response.size(), 0);
-}
+// void	Server::help(std::string* commands, int fd)
+// {
+// 	std::string response = "Available commands:\r\n";
+// 	for (int i = 0; i < 13; i++)
+// 		response += commands[i] + "\r\n";
+// 	send(fd, response.c_str(), response.size(), 0);
+// }
 
-void	Server::nickname(std::vector<std::string> nick, int fd)
-{
-	std::string response;
-	Client *client = getClientByFD(fd);
-	if (client == NULL) //segurança pra testar se o client existe
-	{
-		response = "Client not found\r\n";
-		return;
-	}
+// void	Server::nickname(std::vector<std::string> nick, int fd)
+// {
+// 	std::string response;
+// 	Client *client = getClientByFD(fd);
+// 	if (client == NULL) //segurança pra testar se o client existe
+// 	{
+// 		response = "Client not found\r\n";
+// 		return;
+// 	}
 
-	if (nick.size() < 1 || nick[1].empty()) //se o comando não tiver argumentos
-	{
-		if (client->getNickname() == "")
-			response = "You don't have a nickname yet\r\n";
-		else
-			response = "Your nickname is " + client->getNickname() + "\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-	else
-	{
-		client->setNickname(nick[1]);
-		response = "Nickname changed to " + nick[1] + "\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-	}
-}
+// 	if (nick.size() < 1 || nick[1].empty()) //se o comando não tiver argumentos
+// 	{
+// 		if (client->getNickname() == "")
+// 			response = "You don't have a nickname yet\r\n";
+// 		else
+// 			response = "Your nickname is " + client->getNickname() + "\r\n";
+// 		send(fd, response.c_str(), response.size(), 0);
+// 		return;
+// 	}
+// 	else
+// 	{
+// 		client->setNickname(nick[1]);
+// 		response = "Nickname changed to " + nick[1] + "\r\n";
+// 		send(fd, response.c_str(), response.size(), 0);
+// 	}
+// }
 
 /* void Server::username(std::vector<std::string> user, int fd)
 {

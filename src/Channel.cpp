@@ -1,11 +1,11 @@
-#include "../includes/Channel.hpp"
+#include "Channel.hpp"
 
 Channel::Channel(const std::string& name) : _name(name) {
 	_topic = "";
 	initModes(_modes);
 	_password = "";
 	_clientCount = 0;
-	_limit = 10;
+	_limit = 1000;
 }
 
 Channel::~Channel() {
@@ -15,7 +15,7 @@ Channel::~Channel() {
 
 void Channel::initModes(std::map<std::string, bool>& modes) {
 	modes["i"] = false;
-	modes["t"] = true;
+	modes["t"] = false;
 	modes["k"] = false;
 	modes["o"] = false;
 	modes["l"] = false;
