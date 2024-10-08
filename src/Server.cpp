@@ -250,8 +250,8 @@ void Server::identifyCommand(std::string& string, int fd)
 							  "/topic",
 							  "/kick",
 							  "/join",
-							  "/exit",
 							  "/channel",
+							  "/exit",
 							  "/help",
 							  "/nickname",
 							  "/username",
@@ -293,28 +293,22 @@ void Server::identifyCommand(std::string& string, int fd)
 			case 4:
 				join(parseCommand(parsedCommand), fd);
 				break;
-			// case 5:
+			case 5:
+				channelMsg(parseCommand(parsedCommand), fd);
+				break;
+			// case 6:
 			// 	exit(fd);
 			// 	break;
-			// case 6:
-			// 	//channel();
-			// 	break;
 			// case 7:
-			// 	//promote(fd);
-			// 	break;
-			// case 8:
-			// 	//demote(fd);
-			// 	break;
-			// case 9:
 			// 	help(requests, fd);
 			// 	break;
-			// case 10:
+			// case 8:
 			// 	nickname(parseCommand(parsedCommand), fd);
 			// 	break;
-			// case 11:
+			// case 9:
 			// 	//username(parseCommand(parsedCommand), fd);
 			// 	break;
-			// case 12:
+			// case 10:
 			// 	//pmsg(parseCommand(parsedCommand), fd);
 			// 	break;
 			default:

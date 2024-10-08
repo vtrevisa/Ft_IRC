@@ -14,6 +14,13 @@ void Server::mode(std::vector<std::string> string, int fd) {
 		return;
 	}
 
+	//verifica se o client que chamou o comando está no canal
+	if (!channel->isOnChannel(client->getNickname())) {
+		response = "You must be on the channel to use mode command\r\n";
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+	}
+
 	//verifica se o usuário é um operador
 	if (!channel->isOperator(client->getNickname())) {
 		response = "You don't have operator privileges on this channel\r\n";

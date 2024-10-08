@@ -4,8 +4,8 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	std::string response;
 
 	//verifica se os parametros estão vazios
-	if (string.size() == 0 || string[0] == "") {
-		response = "Invalid number of arguments\r\nUsage: /kick <client to be kicked> <channel name> (optional)<reason>\r\n";
+	if (string.size() == 0 || string[0] == "" || string.size() > 3) {
+		response = "Invalid number of arguments\r\nUsage: /kick <client to be kicked> <channel name> (optional)<reason in double quotes>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -23,7 +23,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 
 	//verifica se o client que chamou o comando está no canal
 	if (!channel->isOnChannel(client->getNickname())) {
-		response = "You must be on the channel to invite other clients\r\n";
+		response = "You must be on the channel to use kick command\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -35,7 +35,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 		return;
 	}
 
-	//verifica se o client convidado existe
+	//verifica se o client a ser expulso existe
 	Client* kickedClient = getClientByNick(string[0]);
 	if (kickedClient == NULL) {
 		response = "This client does not exist\r\n";
@@ -43,7 +43,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 		return;
 	}
 
-	//verifica se o client convidado esta no canal
+	//verifica se o client a ser expulso esta no canal
 	if (!channel->isOnChannel(kickedClient->getNickname())) {
 		response = "This client is not on this channel\r\n";
 		send(fd, response.c_str(), response.size(), 0);
@@ -64,4 +64,9 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	int kickedClientFD = kickedClient->getFd();
 	response = "You were kicked from the channel " + channelName + "\r\nReason: " + reason + "\r\n";
 	send(kickedClientFD, response.c_str(), response.size(), 0);
+
+	std::vector<Client *> clients = channel->getAllClients();
+	response = client->getNickname() + " has been kicked from this channel\r\nReason: " + reason + "\r\n";
+	for (size_t i = 0; i < clients.size(); i++)
+		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 }

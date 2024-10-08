@@ -5,7 +5,7 @@ void Server::topic(std::vector<std::string> string, int fd) {
 
 	//verifica se os parametros estão vazios
 	if (string.size() == 0 || string[0] == "" || string.size() > 2) {
-		response = "Invalid number of arguments\r\nUsage: /topic <channel name> (optional)<topic in quotes>\r\n";
+		response = "Invalid number of arguments\r\nUsage: /topic <channel name> (optional)<topic in double quotes>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -28,6 +28,13 @@ void Server::topic(std::vector<std::string> string, int fd) {
 		return;
 	} else { //verifica o status de operador do usuário que chamou o comando, as restrições de topico e aplica um novo tópico ao canal
 		std::string topic = string[1];
+
+		//verifica se o client que chamou o comando está no canal
+		if (!channel->isOnChannel(client->getNickname())) {
+			response = "You must be on the channel to set a topic\r\n";
+			send(fd, response.c_str(), response.size(), 0);
+			return;
+		}
 
 		if (channel->getMode("t") == true && !channel->isOperator(client->getNickname())) {
 			response = "The topic restrictions are set on this channel\r\nYou must have operator privileges\r\n";
