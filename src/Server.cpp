@@ -297,11 +297,11 @@ void Server::identifyCommand(std::string& string, int fd)
 				channelMsg(parseCommand(parsedCommand), fd);
 				break;
 			case 6:
-				exit(fd);
+				exit(parseCommand(parsedCommand), fd);
 				break;
-			// case 7:
-			// 	help(requests, fd);
-			// 	break;
+			case 7:
+				help(parseCommand(parsedCommand), fd);
+				break;
 			// case 8:
 			// 	nickname(parseCommand(parsedCommand), fd);
 			// 	break;

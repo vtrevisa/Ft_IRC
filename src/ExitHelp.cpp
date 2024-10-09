@@ -1,13 +1,5 @@
 #include "Server.hpp"
 
-// void	Server::help(std::string* commands, int fd)
-// {
-// 	std::string response = "Available commands:\r\n";
-// 	for (int i = 0; i < 13; i++)
-// 		response += commands[i] + "\r\n";
-// 	send(fd, response.c_str(), response.size(), 0);
-// }
-
 // void	Server::nickname(std::vector<std::string> nick, int fd)
 // {
 // 	std::string response;
