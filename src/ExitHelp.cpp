@@ -1,34 +1,5 @@
 #include "Server.hpp"
 
-// void	Server::exit(int fd)
-// {
-// 	std::string response = "Goodbye!\r\n";
-// 	send(fd, response.c_str(), response.size(), 0);
-// 	std::cout << RED << "Client <" << fd << "> Disconnected" << WHI << std::endl;
-// 	close(fd);
-// 	ClearClients(fd);
-// }
-
-/* void	Server::join()
-{
-	std::cout << "Join" << std::endl;
-} */
-
-/* void	Server::channel()
-{
-	std::cout << "Channel" << std::endl;
-} */
-
-/* void	Server::promote(int fd)
-{
-	std::cout << "Promote" << std::endl;
-} */
-
-/* void	Server::demote(int fd)
-{
-	std::cout << "Demote" << std::endl;
-} */
-
 // void	Server::help(std::string* commands, int fd)
 // {
 // 	std::string response = "Available commands:\r\n";

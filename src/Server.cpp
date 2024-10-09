@@ -296,9 +296,9 @@ void Server::identifyCommand(std::string& string, int fd)
 			case 5:
 				channelMsg(parseCommand(parsedCommand), fd);
 				break;
-			// case 6:
-			// 	exit(fd);
-			// 	break;
+			case 6:
+				exit(fd);
+				break;
 			// case 7:
 			// 	help(requests, fd);
 			// 	break;

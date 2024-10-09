@@ -53,7 +53,7 @@ class Server //-> class for server
 		void						kick(std::vector<std::string> string, int fd); //done
 		void						join(std::vector<std::string> string, int fd); //done
 		void						channelMsg(std::vector<std::string> string, int fd); //done
-		// void						exit(int fd); //done
+		void						exit(int fd); //done
 		// void						channel();
 		// void						help(std::string* commands, int fd);
 		// void						nickname(std::vector<std::string> nick, int fd);
