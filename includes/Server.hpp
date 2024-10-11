@@ -56,6 +56,7 @@ class Server //-> class for server
 		void						exit(std::vector<std::string> string, int fd); //done
 		void						help(std::vector<std::string> string, int fd); //done
 		void						pmsg(std::vector<std::string> string, int fd); //done
+		void						quit(std::vector<std::string> string, int fd); //done
 		// void						nickname(std::vector<std::string> nick, int fd);
 		// void						username(std::vector<std::string> user, int fd);
 };

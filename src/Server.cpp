@@ -254,6 +254,7 @@ void Server::identifyCommand(std::string& string, int fd)
 							  "/exit",
 							  "/help",
 							  "/pmsg",
+							  "/quit",
 							  "/nickname",
 							  "/username"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
 
@@ -262,7 +263,7 @@ void Server::identifyCommand(std::string& string, int fd)
 		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));
 
 		//loop que vai identificar o comando
-		for (; i < 11; i++) //substituir XXXX pelo numero de comandos totais descritos acima
+		for (; i < 12; i++) //substituir XXXX pelo numero de comandos totais descritos acima
 			if(command == requests[i])
 				break;
 
@@ -303,10 +304,13 @@ void Server::identifyCommand(std::string& string, int fd)
 			case 8:
 				pmsg(parseCommand(parsedCommand), fd);
 				break;
-			// case 8:
+			case 9:
+				quit(parseCommand(parsedCommand), fd);
+				break;
+			// case 10:
 			// 	nickname(parseCommand(parsedCommand), fd);
 			// 	break;
-			// case 9:
+			// case 11:
 			// 	//username(parseCommand(parsedCommand), fd);
 			// 	break;
 			default:
