@@ -15,7 +15,7 @@ class Server //-> class for server
 		int							_Port; //-> server port
 		int							_SerSocketFd; //-> server socket file descriptor
 		static bool					_Signal; //-> static boolean for signal
-		std::vector<Client>		_clients; //-> vector of clients
+		std::vector<Client>			_clients; //-> vector of clients
 		std::vector<struct pollfd>	_fds; //-> vector of pollfd
 		std::vector<Channel>		_channels;
 

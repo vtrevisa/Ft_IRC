@@ -9,7 +9,7 @@ void Server::ServerInit(int port, std::string passwd) {
 	this->_passwd = passwd;
 	SerSocket(); //-> create the server socket
 
-	std::cout << GRE << "Server <" << _SerSocketFd << "> Connected" << WHI << std::endl;
+	std::cout << GREEN << "Server <" << _SerSocketFd << "> Connected" << WHITE << std::endl;
 	std::cout << "Waiting to accept a connection...\n";
 
 	while (Server::_Signal == false) { //-> run the server until the signal is received
@@ -92,7 +92,7 @@ void Server::AcceptNewClient() {
 	_clients.push_back(cli); //-> add the client to the vector of clients
 	_fds.push_back(NewPoll); //-> add the client socket to the pollfd
 
-	std::cout << YEL << "Client <" << incofd << "> requested connection" << WHI << std::endl; // Accept the client
+	std::cout << YELLOW << "Client <" << incofd << "> requested connection" << WHITE << std::endl; // Accept the client
 	std::string passwordRequest = "Please enter the password:\r\n";
 	send(incofd, passwordRequest.c_str(), passwordRequest.size(), 0);
 }
@@ -105,7 +105,7 @@ void Server::Authentication(Client* client)
 	ssize_t bytes = recv(client->getFd(), buffer, sizeof(buffer) - 1, 0);
 	if (bytes <= 0) {
 		std::cerr << "Error receiving password from client" << std::endl;
-		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHI << std::endl;
+		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHITE << std::endl;
 		return;
 	}
 
@@ -114,11 +114,11 @@ void Server::Authentication(Client* client)
 
 	if (receivedPassword == this->_passwd) {
 		client->setStatus(CONNECTED);
-		std::cout << GRE << "Client <" << client->getFd() << "> Connected!" << WHI << std::endl;
+		std::cout << GREEN << "Client <" << client->getFd() << "> Connected!" << WHITE << std::endl;
 		std::string response = "Password accepted!\r\n";
 		send(client->getFd(), response.c_str(), response.size(), 0);
 	} else {
-		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHI << std::endl;
+		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHITE << std::endl;
 		std::string response = "Password incorrect!\r\n";
 		send(client->getFd(), response.c_str(), response.size(), 0);
 		close(client->getFd());
@@ -134,7 +134,7 @@ void Server::ReceiveNewData(int fd) {
 	ssize_t bytes = recv(fd, buff, 1023, 0); //-> receive the data
 
 	if (bytes <= 0) { //-> check if the client disconnected
-		std::cout << RED << "Client <" << fd << "> Disconnected" << WHI << std::endl;
+		std::cout << RED << "Client <" << fd << "> Disconnected" << WHITE << std::endl;
 		client->clientBuff.clear();
 		ClearClients(fd); //-> clear the client
 		close(fd); //-> close the client socket
@@ -160,11 +160,11 @@ void Server::SignalHandler(int signum) {
 
 void Server::CloseFds() {
 	for(size_t i = 0; i < _clients.size(); i++) { //-> close all the clients
-		std::cout << RED << "Client <" << _clients[i].getFd() << "> Disconnected" << WHI << std::endl;
+		std::cout << RED << "Client <" << _clients[i].getFd() << "> Disconnected" << WHITE << std::endl;
 		close(_clients[i].getFd());
 	}
 	if (_SerSocketFd != -1) { //-> close the server socket
-		std::cout << RED << "Server <" << _SerSocketFd << "> Disconnected" << WHI << std::endl;
+		std::cout << RED << "Server <" << _SerSocketFd << "> Disconnected" << WHITE << std::endl;
 		close(_SerSocketFd);
 	}
 }
@@ -260,8 +260,6 @@ void Server::identifyCommand(std::string& string, int fd)
 	do {
 		int i = 0;
 		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));
-		std::cout << "message: " << string << std::endl;
-		std::cout << "client: " << fd << std::endl;
 
 		//loop que vai identificar o comando
 		for (; i < 11; i++) //substituir XXXX pelo numero de comandos totais descritos acima

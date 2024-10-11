@@ -15,11 +15,10 @@
 #include <cstring> //-> for memset()
 #include <cstdlib> //-> for atoi()
 //-------------------------------------------------------//
-#define RED "\e[1;31m" //-> for red color
-#define WHI "\e[0;37m" //-> for white color
-#define GRE "\e[1;32m" //-> for green color
-#define YEL "\e[1;33m" //-> for yellow color
-//-------------------------------------------------------//
-#define DEBUG //-> for debugging
+#define RED "\e[1;31m"
+#define WHITE "\e[0;37m"
+#define GREEN "\e[1;32m"
+#define YELLOW "\e[1;33m"
+#define BLUE "\e[1;36m"
 
 #endif
