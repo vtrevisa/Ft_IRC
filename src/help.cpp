@@ -24,6 +24,8 @@ void Server::help(std::vector<std::string> string, int fd) {
 	send(fd, response.c_str(), response.size(), 0);
 	response = std::string(GREEN) + "/exit - exit server\r\n       Usage: /exit\r\n";
 	send(fd, response.c_str(), response.size(), 0);
+	response = std::string(GREEN) + "/quit - quit channel\r\n       Usage: /quit <channel name>\r\n";
+	send(fd, response.c_str(), response.size(), 0);
 	response = std::string(GREEN) + "/nickname - set nickname\r\n       Usage: \r\n";//to be done
 	send(fd, response.c_str(), response.size(), 0);
 	response = std::string(GREEN) + "/username - set useuname\r\n       Usage: \r\n";//to be done
