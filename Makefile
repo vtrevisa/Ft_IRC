@@ -2,7 +2,7 @@
 
 NAME = ft_irc
 SRC = main.cpp Server.cpp Client.cpp Channel.cpp mode.cpp invite.cpp kick.cpp topic.cpp\
-		join.cpp channelMsg.cpp exit.cpp help.cpp pmsg.cpp quit.cpp ExitHelp.cpp
+		join.cpp channelMsg.cpp exit.cpp help.cpp pmsg.cpp quit.cpp nickname.cpp username.cpp
 
 #----DIRS--------------------------------------------------------------------------------------
 OBJ_DIR = obj
