@@ -32,9 +32,3 @@
 	std::string response = "Username changed to " + user[1] + "\r\n";
 	send(fd, response.c_str(), response.size(), 0);
 } */
-
-/* void	Server::pmsg(std::vector<std::string> msg, int fd)
-{
-	std::string response = "Private message sent to " + msg[1] + "\r\n";
-	send(fd, response.c_str(), response.size(), 0);
-} */

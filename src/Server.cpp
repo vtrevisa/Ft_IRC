@@ -253,9 +253,9 @@ void Server::identifyCommand(std::string& string, int fd)
 							  "/channel",
 							  "/exit",
 							  "/help",
+							  "/pmsg",
 							  "/nickname",
-							  "/username",
-							  "/pmsg"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
+							  "/username"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
 
 	do {
 		int i = 0;
@@ -302,14 +302,14 @@ void Server::identifyCommand(std::string& string, int fd)
 			case 7:
 				help(parseCommand(parsedCommand), fd);
 				break;
+			case 8:
+				pmsg(parseCommand(parsedCommand), fd);
+				break;
 			// case 8:
 			// 	nickname(parseCommand(parsedCommand), fd);
 			// 	break;
 			// case 9:
 			// 	//username(parseCommand(parsedCommand), fd);
-			// 	break;
-			// case 10:
-			// 	//pmsg(parseCommand(parsedCommand), fd);
 			// 	break;
 			default:
 				unknownCommand(command, fd);
