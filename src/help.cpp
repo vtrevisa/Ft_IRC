@@ -1,9 +1,9 @@
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 
 void Server::help(std::vector<std::string> string, int fd) {
 	std::string response;
 	if (string.size() != 0) {
-		response = std::string(RED) + "Too many arguments\r\nUsage: /help\r\n";
+		response = std::string(RED) + "Too many arguments\r\nUsage: /help\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}

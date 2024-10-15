@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 
 void Server::invite(std::vector<std::string> string, int fd) {
 	std::string response;
@@ -38,23 +38,25 @@ void Server::invite(std::vector<std::string> string, int fd) {
 	//verifica se o client convidado existe
 	Client* invitedClient = getClientByNick(string[0]);
 	if (invitedClient == NULL) {
-		response = std::string(RED) + "This client does not exist\r\n";
+		response = std::string(RED) + "This client does not exist\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	//verifica se o client convidado já esta no canal
 	if (channel->isOnChannel(invitedClient->getNickname())) {
-		response = std::string(RED) + "This client is already on this channel\r\n";
+		response = std::string(RED) + "This client is already on this channel\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	channel->addToInviteList(invitedClient->getNickname());
-	response = std::string(YELLOW) + "Invite sent\r\n";
+	response = std::string(YELLOW) + "Invite sent\r\n" + std::string(WHITE);
 	send(fd, response.c_str(), response.size(), 0);
 
 	int invitedClientFD = invitedClient->getFd();
-	response = std::string(YELLOW) + client->getNickname() + " sent you an invite to enter the chanel " + channelName + "\r\n";
+	response = std::string(YELLOW) + client->getNickname() +
+				" sent you an invite to enter the chanel " +
+				channelName + "\r\n" + std::string(WHITE);
 	send(invitedClientFD, response.c_str(), response.size(), 0);
 }

@@ -1,11 +1,13 @@
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 
 void Server::kick(std::vector<std::string> string, int fd) {
 	std::string response;
 
 	//verifica se os parametros estão vazios
 	if (string.size() == 0 || string[0] == "" || string.size() > 3) {
-		response = std::string(RED) + "Invalid number of arguments\r\nUsage: /kick <client to be kicked> <channel name> (optional)<reason in double quotes>\r\n";
+		response = std::string(RED) + "Invalid number of arguments\r\n" +
+				   "Usage: /kick <client to be kicked> <channel name> (optional)<reason in double quotes>\r\n"
+				   + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}

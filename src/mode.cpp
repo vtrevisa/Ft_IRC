@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 
 void Server::mode(std::vector<std::string> string, int fd) {
 	std::string response;
@@ -9,21 +9,21 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 	//verifica se o canal existe no server
 	if (channel == NULL) {
-		response = std::string(RED) + "Channel does not exist\r\n";
+		response = std::string(RED) + "Channel does not exist\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	//verifica se o client que chamou o comando está no canal
 	if (!channel->isOnChannel(client->getNickname())) {
-		response = std::string(RED) + "You must be on the channel to use mode command\r\n";
+		response = std::string(RED) + "You must be on the channel to use mode command\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	//verifica se o usuário é um operador
 	if (!channel->isOperator(client->getNickname())) {
-		response = std::string(RED) + "You don't have operator privileges on this channel\r\n";
+		response = std::string(RED) + "You don't have operator privileges on this channel\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -74,7 +74,9 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 5:			
 			if (modeArg == "") {
-				response = std::string(RED) + "You must provide a password to be set\r\nUsage: /mode <channel name> +k <password>\r\n";
+				response = std::string(RED) +
+				"You must provide a password to be set\r\nUsage: /mode <channel name> +k <password>\r\n"
+				+ std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -84,19 +86,23 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 6:
 			if (modeArg == "") {
-				response = std::string(RED) + "You must provide a client to be demoted\r\nUsage: /mode <channel name> -o <nickname>\r\n";
+				response = std::string(RED) +
+				"You must provide a client to be demoted\r\nUsage: /mode <channel name> -o <nickname>\r\n"
+				+ std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (clientArg == NULL) {
-				response = std::string(RED) + "This client is not on this channel\r\n";
+				response = std::string(RED) + "This client is not on this channel\r\n"
+				+ std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (!channel->isOperator(clientArg->getNickname())) {
-				response = std::string(RED) + "This client is not an operator on this channel\r\n";
+				response = std::string(RED) + "This client is not an operator on this channel\r\n"
+				+ std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -106,19 +112,21 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 7:
 			if (modeArg == "") {
-				response = std::string(RED) + "You must provide a client to be promoted\r\nUsage: /mode <channel name> +o <nickname>\r\n";
+				response = std::string(RED) +
+				"You must provide a client to be promoted\r\nUsage: /mode <channel name> +o <nickname>\r\n"
+				+ std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (clientArg == NULL) {
-				response = std::string(RED) + "This client is not on this channel\r\n";
+				response = std::string(RED) + "This client is not on this channel\r\n" + std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (channel->isOperator(clientArg->getNickname())) {
-				response = std::string(RED) + "This client is already an operator on this channel\r\n";
+				response = std::string(RED) + "This client is already an operator on this channel\r\n" + std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -133,7 +141,9 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 9:
 			if (modeArg == "") {
-				response = std::string(RED) + "You must provide a limit to be set\r\nUsage: /mode <channel name> +l <limit>\r\n";
+				response = std::string(RED) +
+				"You must provide a limit to be set\r\nUsage: /mode <channel name> +l <limit>\r\n"
+				+ std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -144,11 +154,14 @@ void Server::mode(std::vector<std::string> string, int fd) {
 			break;
 
 		default:
-			response = std::string(RED) + "Invalid mode\r\n";
+			response = std::string(RED) + "Invalid mode\r\n" + std::string(WHITE);
 			break;
 	}
 
-	response = std::string(YELLOW) + "#" + channel->getName() + ": " + client->getNickname() + " has set this channel topic to: " + channel->getTopic() + "\r\n";
+	response = std::string(YELLOW) + "#" + channel->getName() +
+			   ": " + client->getNickname() + " has set this channel topic to: " +
+			   channel->getTopic() + "\r\n"
+			   + std::string(WHITE);
 	std::vector<Client *> clients = channel->getAllClients();
 	for (size_t i = 0; i < clients.size(); i++)
 		send(clients[i]->getFd(), response.c_str(), response.size(), 0);

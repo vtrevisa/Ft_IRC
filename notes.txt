@@ -1,0 +1,12 @@
+-> Na função unknown command, tem um send após o recv que não passa novamente pelo poll (Basic checks, 3);
+
+-> Rodando o comando join, valgrind acusa "invalid read of size 8" 2x(oin.cpp:42);
+
+-> Em help.cpp tem um 'if' que talvez esteJa errado (help.cpp:5);
+
+-> Em help.cpp existem vários sends seguidos, a régua pede apenas 1 para cada poll;
+
+-> Enviar um comando com ctrl+D no meio deveria fazer o servidor esperar o /n para processar o comando todo (Networking specials, 1);
+
+-> Enviar um comando com ctrl+D está dando erro de valgrind (Networking Specials, 3);
+
