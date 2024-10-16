@@ -206,6 +206,13 @@ Channel* Server::getChannel(const std::string& channelName) {
 	return NULL;
 }
 
+std::vector<Client*> Server::getAllClients() {
+	std::vector<Client*> clientList;
+	for (size_t i = 0; i < _clients.size(); ++i)
+		clientList.push_back(&_clients[i]);
+	return clientList;
+}
+
 bool Server::channelExists(std::string& channelName) {
     for (std::vector<Channel>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
         if (it->getName() == channelName)
@@ -310,9 +317,9 @@ void Server::identifyCommand(std::string& string, int fd)
 			// case 10:
 			// 	nickname(parseCommand(parsedCommand), fd);
 			// 	break;
-			// case 11:
-			// 	//username(parseCommand(parsedCommand), fd);
-			// 	break;
+			case 11:
+				username(parseCommand(parsedCommand), fd);
+				break;
 			default:
 				unknownCommand(command, fd);
 				break;

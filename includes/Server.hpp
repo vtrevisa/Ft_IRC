@@ -37,6 +37,7 @@ class Server //-> class for server
 		Client*						getClientByFD(int fd);
 		Client*						getClientByNick(std::string nickname);
 		Channel*					getChannel(const std::string& channelName);
+		std::vector<Client*>		getAllClients();
 
 		bool						channelExists(std::string &channelName);
 		void						createChannel(std::string channelName);
@@ -58,7 +59,7 @@ class Server //-> class for server
 		void						pmsg(std::vector<std::string> string, int fd); //done
 		void						quit(std::vector<std::string> string, int fd); //done
 		// void						nickname(std::vector<std::string> nick, int fd);
-		// void						username(std::vector<std::string> user, int fd);
+		void						username(std::vector<std::string> string, int fd); //done
 };
 
 #endif
