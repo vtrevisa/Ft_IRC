@@ -41,12 +41,14 @@ void Server::join(std::vector<std::string> string, int fd) {
 		return;
 	}
 
-	std::string password = string[1];
-	//verifica se a senha é a correta
-	if (!channelPassword.empty() && channelPassword != password) {
-		response = std::string(RED) + "Wrong password\r\n" + std::string(WHITE);
-		send(fd, response.c_str(), response.size(), 0);
-		return;
+	if (!channelPassword.empty()) {
+		std::string password = string[1];
+		//verifica se a senha é a correta
+		if (!channelPassword.empty() && channelPassword != password) {
+			response = std::string(RED) + "Wrong password\r\n" + std::string(WHITE);
+			send(fd, response.c_str(), response.size(), 0);
+			return;
+		}
 	}
 
 	//verifica se o canal está cheio
