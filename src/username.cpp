@@ -47,4 +47,6 @@ void Server::username(std::vector<std::string> string, int fd) {
 	}
 
 	client->setClientname(username);
+	response = std::string(YELLOW) + "Your username has been set to: " + username + "\r\n" + std::string(WHITE);
+	send(fd, response.c_str(), response.size(), 0);
 }
