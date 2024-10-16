@@ -342,6 +342,5 @@ std::vector<std::string> Server::parseCommand(std::string string) {
 
 void Server::unknownCommand(std::string command, int fd) {
 	std::string response = command + ": Unknown command\r\n";
-	if(send(fd, response.c_str(), response.size(), 0) == -1)
-		std::cerr << "Error sending message" << std::endl;
+	send(fd, response.c_str(), response.size(), 0);
 }
