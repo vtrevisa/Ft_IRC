@@ -8,6 +8,19 @@ void Server::help(std::vector<std::string> string, int fd) {
 		return;
 	}
 
-    response = std::string(GREEN) + "Commands:\r\n" + MODE + INVITE + TOPIC + KICK + JOIN + CHANNEL + EXIT + QUIT + NICK + USER + PRIVATEMSG + std::string(WHITE);
+    response = std::string(GREEN)
+				+ "Commands:\r\n"
+				+ MODE
+				+ INVITE
+				+ TOPIC
+				+ KICK
+				+ JOIN
+				+ CHANNEL
+				+ EXIT
+				+ QUIT
+				+ NICK
+				+ USER
+				+ PRIVATEMSG
+				+ std::string(WHITE);
 	send(fd, response.c_str(), response.size(), 0);
 }
