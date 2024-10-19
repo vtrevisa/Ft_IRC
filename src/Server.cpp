@@ -314,9 +314,9 @@ void Server::identifyCommand(std::string& string, int fd)
 			case 9:
 				quit(parseCommand(parsedCommand), fd);
 				break;
-			// case 10:
-			// 	nickname(parseCommand(parsedCommand), fd);
-			// 	break;
+			case 10:
+				nickname(parseCommand(parsedCommand), fd);
+				break;
 			case 11:
 				username(parseCommand(parsedCommand), fd);
 				break;
@@ -345,6 +345,7 @@ std::vector<std::string> Server::parseCommand(std::string string) {
 		splittedVector.push_back("");
 
 	return splittedVector;
+
 }
 
 void Server::unknownCommand(std::string command, int fd) {
