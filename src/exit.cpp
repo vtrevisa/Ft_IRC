@@ -11,7 +11,10 @@ void	Server::exit(std::vector<std::string> string, int fd) {
 	}
 
 	send(fd, response.c_str(), response.size(), 0);
-	std::cout << RED << "Client <" << client->getNickname() << "> Disconnected" << WHITE << std::endl;
+	if (client->getNickname() == "")
+		std::cout << RED << "Client " << client->getFd() << "Disconnected" << WHITE << std::endl;
+	else
+		std::cout << RED << "Client <" << client->getNickname() << "> Disconnected" << WHITE << std::endl;
 	close(fd);
 	ClearClients(fd);
 }

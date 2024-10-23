@@ -52,8 +52,15 @@ void Server::join(std::vector<std::string> string, int fd) {
 	}
 
 	//verifica se o canal está cheio
+	std::vector<Client *> clients = channel->getAllClients();
 	if(channel->getClientCount() < channel->getLimit()) {
-		channel->addClient(client);
+		for (size_t i = 0; i < clients.size(); i++) {
+			if (client->getFd() == clients[i]->getFd()) {
+				channel->removeClient(clients[i]->getNickname());
+				channel->addClient(client);
+				return;
+			}
+		}
 	} else {
 		response = std::string(RED) + "You cannot join this channel\r\nThis channel has reached the client limit\r\n" 
 				   + std::string(WHITE);
@@ -64,7 +71,6 @@ void Server::join(std::vector<std::string> string, int fd) {
 	if (owner)
 		channel->promoteToOperator(client->getNickname());
 
-	std::vector<Client *> clients = channel->getAllClients();
 	response = std::string(YELLOW) + "#" + channel->getName() + ": " +
 			   client->getNickname() + " has joined this channel\r\n" +
 			   std::string(WHITE);

@@ -35,8 +35,13 @@ void Server::channelMsg(std::vector<std::string> string, int fd) {
 	}
 
 	std::vector<Client *> clients = channel->getAllClients();
+	std::stringstream ss;
+	ss << client->getFd();
 	for (size_t i = 0; i < clients.size(); i++) {
-		response = std::string(YELLOW) + "#" + channel->getName() + " " + client->getNickname() + ": " + string[1] + "\r\n";
+		if (client->getNickname() == "")
+			response = std::string(YELLOW) + "#" + channel->getName() + " Client " + ss.str() + ": " + string[1] + "\r\n" + std::string(WHITE);
+		else
+			response = std::string(YELLOW) + "#" + channel->getName() + " " + client->getNickname() + ": " + string[1] + "\r\n" + std::string(WHITE);
 		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 	}
 }

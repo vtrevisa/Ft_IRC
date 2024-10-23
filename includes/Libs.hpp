@@ -2,6 +2,7 @@
 #define LIBS_HPP
 
 #include <bits/stdc++.h>
+#include <sstream>
 #include <iostream>
 #include <vector> //-> for vector
 #include <sys/socket.h> //-> for socket()
@@ -29,7 +30,7 @@
 #define CHANNEL "/channel - send message on a channel\r\n       Usage: /channel <channel name> <message in double quotes>\r\n"
 #define EXIT "/exit - exit server\r\n       Usage: /exit\r\n"
 #define QUIT "/quit - quit channel\r\n       Usage: /quit <channel name>\r\n"
-#define NICK "/nickname - set nickname\r\n       Usage: \r\n" //TO BE DONE
+#define NICK "/nickname - set nickname\r\n       Usage: /nickname  (optional)<username>\r\n"
 #define USER "/username - set username\r\n       Usage: /username (optional)<username>\r\n"
 #define PRIVATEMSG "/pmsg - send private message to a client\r\n       Usage: /pmsg <client nickname to send message> <message in double quotes>\r\n"
 
