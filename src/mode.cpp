@@ -1,19 +1,34 @@
 #include "../includes/Server.hpp"
 
+static bool isValidChannelName(const std::string& channelName) {
+    if (channelName.empty() || channelName[0] != '#')
+        return false;
+
+    return true;
+}
+
 void Server::mode(std::vector<std::string> string, int fd) {
 	std::string response;
 
 	Client* client = getClientByFD(fd);
-	std::string channelName = string[0];
-	Channel* channel = getChannel(channelName);
 
-	if (string.size() == 0 || string[0] == "" || string[0] == "/mode" || string.size() > 4) {
+	if (string.size() == 0 || string[0] == "" || string[0] == "MODE" || string.size() > 4) {
 		response = std::string(RED) +
-				"You must provide a client to be demoted\r\nUsage: /mode <channel name> <mode> <option>\r\n"
+				"You must provide a client to be demoted\r\nUsage: MODE #<channel name> +/-<mode> <option>\r\n"
 				+ std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
+
+	bool validChannelName = isValidChannelName(string[0]);
+	if (validChannelName == false) {
+		response = std::string(RED) + "Invalid channel name\r\nUsage: MODE #<channel name> +/-<mode> <option>\r\n" + std::string(WHITE);
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+	}
+
+	std::string channelName = string[0].substr(1);
+	Channel* channel = getChannel(channelName);
 
 	//verifica se o canal existe no server
 	if (channel == NULL) {
@@ -83,7 +98,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 		case 5:			
 			if (modeArg == "") {
 				response = std::string(RED) +
-				"You must provide a password to be set\r\nUsage: /mode <channel name> +k <password>\r\n"
+				"You must provide a password to be set\r\nUsage: MODE #<channel name> +k <password>\r\n"
 				+ std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
@@ -95,7 +110,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 		case 6:
 			if (modeArg == "") {
 				response = std::string(RED) +
-				"You must provide a client to be demoted\r\nUsage: /mode <channel name> -o <nickname>\r\n"
+				"You must provide a client to be demoted\r\nUsage: MODE #<channel name> -o <nickname>\r\n"
 				+ std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
@@ -121,7 +136,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 		case 7:
 			if (modeArg == "") {
 				response = std::string(RED) +
-				"You must provide a client to be promoted\r\nUsage: /mode <channel name> +o <nickname>\r\n"
+				"You must provide a client to be promoted\r\nUsage: MODE #<channel name> +o <nickname>\r\n"
 				+ std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
@@ -150,7 +165,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 		case 9:
 			if (modeArg == "") {
 				response = std::string(RED) +
-				"You must provide a limit to be set\r\nUsage: /mode <channel name> +l <limit>\r\n"
+				"You must provide a limit to be set\r\nUsage: MODE #<channel name> +l <limit>\r\n"
 				+ std::string(WHITE);
 				send(fd, response.c_str(), response.size(), 0);
 				return;
@@ -167,7 +182,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 	}
 
 	response = std::string(YELLOW) + "#" + channel->getName() +
-			   ": " + client->getNickname() + "alterar a mensagem que aparece aqui"
+			   ": " + client->getNickname() + "#" + channel->getName() + ": " + client->getNickname() + " has changed mode setting\r\n"
 			   + std::string(WHITE);
 	std::vector<Client *> clients = channel->getAllClients();
 	for (size_t i = 0; i < clients.size(); i++)

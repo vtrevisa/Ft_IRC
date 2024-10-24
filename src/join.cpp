@@ -1,24 +1,39 @@
 #include "../includes/Server.hpp"
 
+static bool isValidChannelName(const std::string& channelName) {
+    if (channelName.empty() || channelName[0] != '#')
+        return false;
+
+    return true;
+}
+
 void Server::join(std::vector<std::string> string, int fd) {
 	std::string response;
 
-	if (string.size() == 0 || string[0] == "" || string[0] == "/join" || string.size() > 2) {
+	if (string.size() == 0 || string[0] == "" || string[0] == "JOIN" || string.size() > 2) {
 		response = std::string(RED) + 
-				   "Invalid command\r\nUsage: /join <channel name> (optional)<password>\r\n"
+				   "Invalid command\r\nUsage: JOIN #<channel name> (optional)<password>\r\n"
 				   + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	Client* client = getClientByFD(fd);
-	Channel* channel = getChannel(string[0]);
-	const std::string& channelName = string[0];
+	bool validChannelName = isValidChannelName(string[0]);
+	if (validChannelName == false) {
+		std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
+		response = std::string(RED) + "Invalid channel name\r\nUsage: JOIN #<channel name> (optional)<password>\r\n" + std::string(WHITE);
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+	}
+
+	Channel* channel = getChannel(string[0].substr(1));
+	const std::string& channelName = string[0].substr(1);
 	bool owner = false;
 	//verifica se o canal existe e se não existir, cria
 	if (channel == NULL) {
 		createChannel(channelName);
-		channel = getChannel(string[0]);
+		channel = getChannel(string[0].substr(1));
 		owner = true;
 	}
 

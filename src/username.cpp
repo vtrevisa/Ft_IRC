@@ -5,7 +5,7 @@ void Server::username(std::vector<std::string> string, int fd) {
 	
 	//verifica linha de comando passada
 	if (string.size() > 1) {
-		response = std::string(RED) + "Invalid command\r\nUsage: /username (optional)<username>\r\n" + std::string(WHITE);
+		response = std::string(RED) + "Invalid command\r\nUsage: USER (optional)<username>\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -20,7 +20,7 @@ void Server::username(std::vector<std::string> string, int fd) {
 	}
 
 	//verifica se foi passado um username
-	if (string.size() == 0 || string[0] == "" || string[0] == "/username" || string.size() > 1) {
+	if (string.size() == 0 || string[0] == "" || string[0] == "USER" || string.size() > 1) {
 		if (client->getClientname() == "")
 			response = std::string(YELLOW) + "You don't have a username yet\r\n" + std::string(WHITE);
 		else

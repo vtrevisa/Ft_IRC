@@ -1,19 +1,41 @@
 #include "../includes/Server.hpp"
 
+static bool isValidChannelName(const std::string& channelName) {
+    if (channelName.empty() || channelName[0] != '#')
+        return false;
+
+    return true;
+}
+
+static bool isValidTopic(const std::string& channelName) {
+    if (channelName.empty() || channelName[0] != ':')
+        return false;
+
+    return true;
+}
+
 void Server::topic(std::vector<std::string> string, int fd) {
 	std::string response;
 
 	//verifica se os parametros estão vazios
-	if (string.size() == 0 || string[0] == "" || string[0] == "/topic" || string.size() > 2) {
+	if (string.size() == 0 || string[0] == "" || string[0] == "TOPIC" || string.size() > 2) {
 		response = std::string(RED) +
-		"Invalid command\r\nUsage: /topic <channel name> (optional)<topic>\r\n"
+		"Invalid command\r\nUsage: TOPIC #<channel name> (optional)<topic>\r\n"
 		+ std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
-	std::string channelName = string[0];
-	Channel* channel = getChannel(string[0]);
+	bool validChannelName = isValidChannelName(string[0]);
+	if (validChannelName == false) {
+		std::cout << RED << "Error getting channel topic..." << WHITE << std::endl;
+		response = std::string(RED) + "Invalid channel name\r\nUsage: TOPIC #<channel name> (optional):<topic>\r\n" + std::string(WHITE);
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+	}
+	
+	std::string channelName = string[0].substr(1);
+	Channel* channel = getChannel(string[0].substr(1));
 
 	//verifica se o canal existe
 	if (channel == NULL) {
@@ -31,7 +53,13 @@ void Server::topic(std::vector<std::string> string, int fd) {
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	} else { //verifica o status de operador do usuário que chamou o comando, as restrições de topico e aplica um novo tópico ao canal
-		std::string topic = string[1];
+		if (!isValidTopic(string[1])) {
+			std::cout << RED << "Error getting channel topic..." << WHITE << std::endl;
+			response = std::string(RED) + "Invalid topic\r\nUsage: TOPIC #<channel name> (optional):<topic>\\r\n" + std::string(WHITE);
+			send(fd, response.c_str(), response.size(), 0);
+			return;
+		}
+		std::string topic = string[1].substr(1);
 
 		//verifica se o client que chamou o comando está no canal
 		if (!channel->isOnChannel(client->getNickname())) {
@@ -55,7 +83,7 @@ void Server::topic(std::vector<std::string> string, int fd) {
 		std::cout << YELLOW << "Setting channel topic..." << WHITE << std::endl;
 		response = std::string(YELLOW) + "#" + channel->getName() +
 				   ": " + client->getNickname() + " has set this channel topic to: " + channel->getTopic()
-				   + std::string(WHITE);
+				   + "\r\n" + std::string(WHITE);
 		for (size_t i = 0; i < clients.size(); i++)
 			send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 	}

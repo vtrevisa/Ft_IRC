@@ -148,10 +148,10 @@ void Server::ReceiveNewData(int fd) {
 	// if (client->clientBuff.find("\n") == std::string::npos)
 	// 	return;
 
-	if (buff[0] == '/')
-		Server::identifyCommand(buff, fd);
-	else
-		std::cout << "Client <" << fd << "> says: " << buff << std::endl;
+	// if (buff[0] == '/')
+	Server::identifyCommand(buff, fd);
+	// else
+	// 	std::cout << "Client <" << fd << "> says: " << buff << std::endl;
 }
 
 bool Server::_Signal = false; //-> initialize the static boolean
@@ -262,24 +262,23 @@ void Server::identifyCommand(std::string string, int fd)
 {
 	std::vector<std::string> splittedStr = splitstr(string);
 	Client* client = Server::getClientByFD(fd);
-	std::string requests[] = {"/mode",
-							  "/invite",
-							  "/topic",
-							  "/kick",
-							  "/join",
+	std::string requests[] = {"MODE",
+							  "INVITE",
+							  "TOPIC",
+							  "KICK",
+							  "JOIN",
 							  "/channel",
-							  "/exit",
-							  "/help",
-							  "/pmsg",
-							  "/quit",
-							  "/nickname",
-							  "/username"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
+							  "QUIT",
+							  "PRIVMSG",
+							  "PART",
+							  "NICK",
+							  "USER"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
 	do {
 		int i = 0;
 		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));
 
 		//loop que vai identificar o comando
-		for (; i < 12; i++) //substituir XXXX pelo numero de comandos totais descritos acima
+		for (; i < 11; i++) //substituir XXXX pelo numero de comandos totais descritos acima
 			if(command == requests[i])
 				break;
 
@@ -309,24 +308,21 @@ void Server::identifyCommand(std::string string, int fd)
 				join(parseCommand(parsedCommand), fd);
 				break;
 			case 5:
-				channelMsg(parseCommand(parsedCommand), fd);
-				break;
-			case 6:
-				exit(parseCommand(parsedCommand), fd);
-				break;
-			case 7:
-				help(parseCommand(parsedCommand), fd);
-				break;
-			case 8:
-				pmsg(parseCommand(parsedCommand), fd);
-				break;
-			case 9:
 				quit(parseCommand(parsedCommand), fd);
 				break;
-			case 10:
+			case 6:
+				help(parseCommand(parsedCommand), fd);
+				break;
+			case 7:
+				pmsg(parseCommand(parsedCommand), fd);
+				break;
+			case 8:
+				part(parseCommand(parsedCommand), fd);
+				break;
+			case 9:
 				nickname(parseCommand(parsedCommand), fd);
 				break;
-			case 11:
+			case 10:
 				username(parseCommand(parsedCommand), fd);
 				break;
 			default:
@@ -338,23 +334,6 @@ void Server::identifyCommand(std::string string, int fd)
 
 	client->clientBuff.clear();
 }
-
-// std::vector<std::string> Server::parseCommand(std::string string) {
-// 	std::string word;
-// 	std::stringstream ss(string);
-// 	std::vector<std::string> splittedVector;
-
-// 	while (std::getline(ss, word, ' ')) {
-// 		if (word.find('\r') != std::string::npos)
-// 			splittedVector.push_back(word.substr(0, word.find('\r')));
-// 		else
-// 			splittedVector.push_back(word);
-// 	}
-// 	if (splittedVector.size() == 0)
-// 		splittedVector.push_back("");
-
-// 	return splittedVector;
-// }
 
 std::vector<std::string> Server::parseCommand(std::string string) {
 	std::string word;

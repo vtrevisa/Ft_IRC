@@ -1,6 +1,13 @@
 #include "../includes/Server.hpp"
 
-std::string parsePMSG(std::vector<std::string> string) {
+// static bool isValidChannelName(const std::string& channelName) {
+//     if (channelName.empty() || channelName[0] != '#')
+//         return false;
+
+//     return true;
+// }
+
+static std::string parseMessage(std::vector<std::string> string) {
 	std::string message;
 	message = string[1].substr(0) + " ";
 	for (size_t i = 2; i < string.size(); i++)
@@ -13,9 +20,9 @@ void Server::pmsg(std::vector<std::string> string, int fd) {
 	std::string response;
 	Client* client = getClientByFD(fd);
 
-	if (string.size() == 0 || string[0] == "" || string[0] == "/pmsg" || string.size() < 2) {
+	if (string.size() == 0 || string[0] == "" || string[0] == "PRIVMSG" || string.size() < 2) {
 		response = std::string(RED) +
-				   "Invalid command\r\nUsage: /psmg <client to send message> <message>\r\n"
+				   "Invalid command\r\nUsage: PRIVMSG <client to send message> <message>\r\n"
 				   + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
@@ -36,7 +43,7 @@ void Server::pmsg(std::vector<std::string> string, int fd) {
 		return;
 	}
 
-	std::string message = parsePMSG(string);
+	std::string message = parseMessage(string);
 	response = std::string(BLUE) + "Private message from " +
 			   client->getNickname() + ": " + message + "\r\n" + std::string(WHITE);
 	send(clientToReach->getFd(), response.c_str(), response.size(), 0);

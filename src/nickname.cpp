@@ -10,7 +10,7 @@ void	Server::nickname(std::vector<std::string> nick, int fd)
 		return;
 	}
 
-	if (nick[0] == "/nickname") //se o comando não tiver argumentos ou o comando não for "/nickname"
+	if (nick[0] == "NICK") //se o comando não tiver argumentos ou o comando não for "/nickname"
 	{
 		if (client->getNickname() == "")
 			response = "You don't have a nickname yet\r\n";
