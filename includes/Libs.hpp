@@ -2,7 +2,6 @@
 #define LIBS_HPP
 
 #include <bits/stdc++.h>
-#include <sstream>
 #include <iostream>
 #include <vector> //-> for vector
 #include <sys/socket.h> //-> for socket()
@@ -22,16 +21,16 @@
 #define YELLOW "\e[1;33m"
 #define BLUE "\e[1;36m"
 //-------------------------------------------------------//
-#define MODE "/mode - check/set channel modes\r\n       Usage: /mode <channel name> <+/-><mode> (opitional)<complement>\r\n"
+#define MODE "/mode - check/set channel modes\r\n       Usage: /mode <channel name> <+/-><mode> (opitional)<option>\r\n"
 #define INVITE "/invite - invite client to channel\r\n       Usage: /invite <client nickname to be invited> <channel name>\r\n"
-#define TOPIC "/topic - check/set channel topic\r\n       Usage: /topic <channel name> (optional)<topic in double quotes>\r\n"
-#define KICK "/kick - kick client from channel\r\n       Usage: /kick <client nickname to be kicked> <channel name> (optional)<reason in double quotes>\r\n"
+#define TOPIC "/topic - check/set channel topic\r\n       Usage: /topic <channel name> (optional)<topic>\r\n"
+#define KICK "/kick - kick client from channel\r\n       Usage: /kick <client nickname to be kicked> <channel name> (optional)<reason>\r\n"
 #define JOIN "/join - join/create a channel\r\n       Usage: /join <channel name> (opitional)<password>\r\n"
-#define CHANNEL "/channel - send message on a channel\r\n       Usage: /channel <channel name> <message in double quotes>\r\n"
+#define CHANNEL "/channel - send message on a channel\r\n       Usage: /channel <channel name> <message>\r\n"
 #define EXIT "/exit - exit server\r\n       Usage: /exit\r\n"
 #define QUIT "/quit - quit channel\r\n       Usage: /quit <channel name>\r\n"
-#define NICK "/nickname - set nickname\r\n       Usage: /nickname  (optional)<username>\r\n"
+#define NICK "/nickname - set nickname\r\n       Usage: /nickname (optional)<nickname>\r\n"
 #define USER "/username - set username\r\n       Usage: /username (optional)<username>\r\n"
-#define PRIVATEMSG "/pmsg - send private message to a client\r\n       Usage: /pmsg <client nickname to send message> <message in double quotes>\r\n"
+#define PRIVATEMSG "/pmsg - send private message to a client\r\n       Usage: /pmsg <client nickname to send message> <message>\r\n"
 
 #endif

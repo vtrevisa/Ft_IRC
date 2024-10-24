@@ -4,8 +4,8 @@ void Server::invite(std::vector<std::string> string, int fd) {
 	std::string response;
 
 	//verifica se os parametros estão vazios
-	if (string.size() == 0 || string[0] == "" || string.size() > 2) {
-		response = std::string(RED) + "Invalid number of arguments\r\nUsage: /invite <client to be invited> <channel name>\r\n";
+	if (string.size() == 0 || string[0] == "" || string[0] == "/invite" || string.size() > 2) {
+		response = std::string(RED) + "Invalid command\r\nUsage: /invite <client to be invited> <channel name>\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -16,21 +16,24 @@ void Server::invite(std::vector<std::string> string, int fd) {
 
 	//verifica se o canal existe
 	if (channel == NULL) {
-		response = std::string(RED) + "Channel does not exist\r\n";
+		std::cout << RED << "Error while inviting..." << WHITE << std::endl;
+		response = std::string(RED) + "Channel does not exist\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	//verifica se o client que chamou o comando está no canal
 	if (!channel->isOnChannel(client->getNickname())) {
-		response = std::string(RED) + "You must be on the channel to use invite command\r\n";
+		std::cout << RED << "Error while inviting..." << WHITE << std::endl;
+		response = std::string(RED) + "You must be on the channel to use invite command\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	//verifica se o client que chamou o comando é operador no canal
 	if (!channel->isOperator(client->getNickname())) {
-		response = std::string(RED) + "You don't have operator privileges on this channel\r\n";
+		std::cout << RED << "Error while inviting..." << WHITE << std::endl;
+		response = std::string(RED) + "You don't have operator privileges on this channel\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -38,6 +41,7 @@ void Server::invite(std::vector<std::string> string, int fd) {
 	//verifica se o client convidado existe
 	Client* invitedClient = getClientByNick(string[0]);
 	if (invitedClient == NULL) {
+		std::cout << RED << "Error while inviting..." << WHITE << std::endl;
 		response = std::string(RED) + "This client does not exist\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
@@ -45,18 +49,18 @@ void Server::invite(std::vector<std::string> string, int fd) {
 
 	//verifica se o client convidado já esta no canal
 	if (channel->isOnChannel(invitedClient->getNickname())) {
+		std::cout << RED << "Error while inviting..." << WHITE << std::endl;
 		response = std::string(RED) + "This client is already on this channel\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	channel->addToInviteList(invitedClient->getNickname());
-	response = std::string(YELLOW) + "Invite sent\r\n" + std::string(WHITE);
-	send(fd, response.c_str(), response.size(), 0);
 
 	int invitedClientFD = invitedClient->getFd();
 	response = std::string(YELLOW) + client->getNickname() +
 				" sent you an invite to enter the chanel " +
 				channelName + "\r\n" + std::string(WHITE);
 	send(invitedClientFD, response.c_str(), response.size(), 0);
+	std::cout << YELLOW << "Sending invite..." << WHITE << std::endl;
 }

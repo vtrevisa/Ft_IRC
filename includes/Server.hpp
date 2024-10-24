@@ -37,13 +37,14 @@ class Server //-> class for server
 		Client*						getClientByFD(int fd);
 		Client*						getClientByNick(std::string nickname);
 		Channel*					getChannel(const std::string& channelName);
+		std::vector<Channel*>		getAllChannels();
 		std::vector<Client*>		getAllClients();
 
 		bool						channelExists(std::string &channelName);
 		void						createChannel(std::string channelName);
 		void						deleteChannel(std::string channelName);
 
-		void						identifyCommand(std::string& string, int fd);
+		void						identifyCommand(std::string string, int fd);
 		std::vector<std::string>	parseCommand(std::string string);
 		void						unknownCommand(std::string command, int fd);
 
@@ -58,7 +59,7 @@ class Server //-> class for server
 		void						help(std::vector<std::string> string, int fd); //done
 		void						pmsg(std::vector<std::string> string, int fd); //done
 		void						quit(std::vector<std::string> string, int fd); //done
-		void						nickname(std::vector<std::string> nick, int fd);
+		void						nickname(std::vector<std::string> nick, int fd); //done
 		void						username(std::vector<std::string> string, int fd); //done
 };
 

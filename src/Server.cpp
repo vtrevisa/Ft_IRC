@@ -89,6 +89,9 @@ void Server::AcceptNewClient() {
 
 	cli.SetFd(incofd); //-> set the client file descriptor
 	cli.setIpAdd(inet_ntoa((cliadd.sin_addr))); //-> convert the ip address to string and set it
+	std::stringstream ss;
+	ss << cli.getFd();
+	cli.setNickname("Client" + ss.str());
 	_clients.push_back(cli); //-> add the client to the vector of clients
 	_fds.push_back(NewPoll); //-> add the client socket to the pollfd
 
@@ -140,13 +143,13 @@ void Server::ReceiveNewData(int fd) {
 		close(fd); //-> close the client socket
 		return;
 	}
-	client->clientBuff.append(buff);
+	// client->clientBuff.append(buff);
 
-	if (client->clientBuff.find("\n") == std::string::npos)
-		return;
+	// if (client->clientBuff.find("\n") == std::string::npos)
+	// 	return;
 
 	if (buff[0] == '/')
-		Server::identifyCommand(client->clientBuff, fd);
+		Server::identifyCommand(buff, fd);
 	else
 		std::cout << "Client <" << fd << "> says: " << buff << std::endl;
 }
@@ -206,6 +209,13 @@ Channel* Server::getChannel(const std::string& channelName) {
 	return NULL;
 }
 
+std::vector<Channel*> Server::getAllChannels() {
+	std::vector<Channel*> channelList;
+	for (size_t i = 0; i < _channels.size(); ++i)
+		channelList.push_back(&_channels[i]);
+	return channelList;
+}
+
 std::vector<Client*> Server::getAllClients() {
 	std::vector<Client*> clientList;
 	for (size_t i = 0; i < _clients.size(); ++i)
@@ -248,7 +258,7 @@ std::vector<std::string> splitstr(std::string string) {
 	return splittedStr;
 }
 
-void Server::identifyCommand(std::string& string, int fd)
+void Server::identifyCommand(std::string string, int fd)
 {
 	std::vector<std::string> splittedStr = splitstr(string);
 	Client* client = Server::getClientByFD(fd);
@@ -264,7 +274,6 @@ void Server::identifyCommand(std::string& string, int fd)
 							  "/quit",
 							  "/nickname",
 							  "/username"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
-
 	do {
 		int i = 0;
 		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));
@@ -330,22 +339,55 @@ void Server::identifyCommand(std::string& string, int fd)
 	client->clientBuff.clear();
 }
 
+// std::vector<std::string> Server::parseCommand(std::string string) {
+// 	std::string word;
+// 	std::stringstream ss(string);
+// 	std::vector<std::string> splittedVector;
+
+// 	while (std::getline(ss, word, ' ')) {
+// 		if (word.find('\r') != std::string::npos)
+// 			splittedVector.push_back(word.substr(0, word.find('\r')));
+// 		else
+// 			splittedVector.push_back(word);
+// 	}
+// 	if (splittedVector.size() == 0)
+// 		splittedVector.push_back("");
+
+// 	return splittedVector;
+// }
+
 std::vector<std::string> Server::parseCommand(std::string string) {
 	std::string word;
 	std::stringstream ss(string);
 	std::vector<std::string> splittedVector;
+	bool insideQuotes = false;
+	std::string temp;
 
-	while (std::getline(ss, word, ' ')) {
-		if (word.find('\r') != std::string::npos)
-			splittedVector.push_back(word.substr(0, word.find('\r')));
-		else
+	if (string.empty()) {
+		splittedVector.push_back("");
+		return splittedVector;
+	}
+
+	while (ss >> word) {
+		if (word[0] == '"' && !insideQuotes) {
+			insideQuotes = true;
+			temp = word.substr(1);
+		} else if (insideQuotes) {
+			temp += " " + word;
+			if (word[word.size() - 1] == '"') {
+				insideQuotes = false;
+				temp = temp.substr(0, temp.size() - 1);
+				splittedVector.push_back(temp);
+				temp.clear();
+			}
+		} else
 			splittedVector.push_back(word);
 	}
+
 	if (splittedVector.size() == 0)
 		splittedVector.push_back("");
 
 	return splittedVector;
-
 }
 
 void Server::unknownCommand(std::string command, int fd) {

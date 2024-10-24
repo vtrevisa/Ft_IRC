@@ -78,12 +78,10 @@ int Channel::getClientCount() const {
 
 std::vector<Client*> Channel::getAllClients() const {
 	std::vector<Client*> allClients;
-	
-	for (std::map<std::string, Client*>::const_iterator it = _operators.begin(); it != _operators.end(); it++)
-		allClients.push_back(it->second);
-	for (std::map<std::string, Client*>::const_iterator it = _clients.begin(); it != _clients.end(); it++)
-		allClients.push_back(it->second);
-	
+
+	for (size_t i = 0; i < _clients.size(); ++i)
+		allClients.push_back(_clients[i]);
+
 	return allClients;
 }
 
@@ -97,23 +95,12 @@ std::string Channel::getAllModes() const {
 	return modes;
 }
 
-std::map<std::string, Client*> Channel::getOperators() const {
+std::vector<Client*> Channel::getOperators() const {
     return this->_operators;
 }
 
-std::map<std::string, Client*> Channel::getNonOperators() const {
+std::vector<Client*> Channel::getNonOperators() const {
     return this->_clients;
-}
-
-std::string Channel::getChannelClientsList() const {
-	std::string clientsList;
-	for (std::map<std::string, Client*>::const_iterator it = _clients.begin(); it != _clients.end(); it++)
-		clientsList += it->first + " ";
-	for (std::map<std::string, Client*>::const_iterator it = _operators.begin(); it != _operators.end(); it++) {
-		clientsList += '@';
-		clientsList += it->first + " ";
-	}
-	return clientsList;
 }
 
 bool Channel::isInvited(const std::string nickname) const {
@@ -124,30 +111,42 @@ bool Channel::isInvited(const std::string nickname) const {
 }
 
 bool Channel::isOperator(const std::string nickname) const {
-	return _operators.find(nickname) != _operators.end();
+	bool isOperator = false;
+
+	for (size_t i = 0; i < _clients.size(); i++)
+		if (nickname == _clients[i]->getNickname())
+			isOperator = true;
+
+    return isOperator;
 }
 
 bool Channel::isOnChannel(const std::string nickname) const {
-    bool isOnChannel = (_clients.find(nickname) != _clients.end());
-    bool isOperator = (_operators.find(nickname) != _operators.end());
-    return isOnChannel || isOperator;
+	bool isOnChannel = false;
+
+	std::vector<Client *> clients = getAllClients();
+	for (size_t i = 0; i < clients.size(); i++)
+		if (nickname == clients[i]->getNickname())
+			isOnChannel = true;
+
+    return isOnChannel;
 }
 
-void Channel::addClient(Client* Client) {
-	_clients.insert(std::make_pair(Client->getNickname(), Client));
+void Channel::addClient(Client* client) {
+	_clients.push_back(client);
 	increaseClientCount();
 }
 
-bool Channel::removeClient(const std::string& nickname) {
-    std::map<std::string, Client*>::iterator it = _clients.find(nickname);
+void Channel::removeClient(const std::string& nickname) {
+	for (size_t i = 0; i < _clients.size(); ++i) {
+		if (_clients[i]->getNickname() == nickname) {
+			_clients.erase(_clients.begin() + i);
+			decreaseClientCount();
+		}
+	}
 
-    if (it != _clients.end()) {
-        _clients.erase(it);
-		return true;
-    } else {
-		std::cout << "This client is not on this channel!!" << std::endl;
-		return false;
-    }
+	for (size_t i = 0; i < _operators.size(); ++i)
+		if (_operators[i]->getNickname() == nickname)
+			_operators.erase(_operators.begin() + i);
 }
 
 void Channel::addToInviteList(const std::string nickname) {
@@ -164,29 +163,13 @@ void Channel::removeFromInviteList(const std::string nickname) {
 }
 
 void Channel::promoteToOperator(const std::string nickname) {
-    std::map<std::string, Client*>::iterator it = _clients.find(nickname);
-    if (it != _clients.end()) {
-        _operators[nickname] = it->second;
-        _clients.erase(it);
-    }
+	for (size_t i = 0; i < _clients.size(); ++i)
+		if (_clients[i]->getNickname() == nickname)
+			_operators.push_back(_clients[i]);
 }
 
 void Channel::demoteFromOperator(const std::string nickname) {
-    std::map<std::string, Client*>::iterator it = _operators.find(nickname);
-    if (it != _operators.end()) {
-        _clients[nickname] = it->second;
-        _operators.erase(it);
-    }
-}
-
-void Channel::listClients() const {
-	std::cout << "List of Clients:\r\n";
-	for (std::map<std::string, Client*>::const_iterator it = _clients.begin(); it != _clients.end(); it++)
-		std::cout << it->second->getNickname() << std::endl;
-}
-
-void Channel::listOperators() const {
-	std::cout << "List of Operators:\r\n";
-	for (std::map<std::string, Client*>::const_iterator it = _operators.begin(); it != _operators.end(); it++)
-		std::cout << it->second->getNickname() << std::endl;
+	for (size_t i = 0; i < _clients.size(); ++i)
+		if (_clients[i]->getNickname() == nickname)
+			_operators.erase(_clients.begin() + i);
 }

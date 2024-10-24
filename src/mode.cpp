@@ -7,6 +7,14 @@ void Server::mode(std::vector<std::string> string, int fd) {
 	std::string channelName = string[0];
 	Channel* channel = getChannel(channelName);
 
+	if (string.size() == 0 || string[0] == "" || string[0] == "/mode" || string.size() > 4) {
+		response = std::string(RED) +
+				"You must provide a client to be demoted\r\nUsage: /mode <channel name> <mode> <option>\r\n"
+				+ std::string(WHITE);
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+	}
+
 	//verifica se o canal existe no server
 	if (channel == NULL) {
 		response = std::string(RED) + "Channel does not exist\r\n" + std::string(WHITE);
@@ -31,7 +39,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 	//verifica se o usuário enviou um modo para alterar, caso não tenha enviado, retorna a lista de modos ativos no canal
 	if (string.size() == 1 || string[1] == "") {
 		std::string modes = channel->getAllModes();
-		response = std::string(YELLOW) + "#" + channel->getName() + ": Modes on this channel: "+ modes + "\r\n";
+		response = std::string(YELLOW) + "#" + channel->getName() + ": Modes on this channel: "+ modes + "\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -159,8 +167,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 	}
 
 	response = std::string(YELLOW) + "#" + channel->getName() +
-			   ": " + client->getNickname() + " has set this channel topic to: " +
-			   channel->getTopic() + "\r\n"
+			   ": " + client->getNickname() + "alterar a mensagem que aparece aqui"
 			   + std::string(WHITE);
 	std::vector<Client *> clients = channel->getAllClients();
 	for (size_t i = 0; i < clients.size(); i++)
