@@ -3,7 +3,7 @@
 void Server::join(std::vector<std::string> string, int fd) {
 	std::string response;
 
-	if (string.size() == 0 || string[0] == "" || string.size() > 2) {
+	if (string.size() == 0 || string[0] == "" || string[0] == "/join" || string.size() > 2) {
 		response = std::string(RED) + 
 				   "Invalid number of arguments\r\nUsage: /join <channel name> (optional)<password>\r\n"
 				   + std::string(WHITE);
