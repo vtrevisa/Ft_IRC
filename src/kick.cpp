@@ -59,7 +59,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 			return;
 		}
 
-		std::cout << RED << "Kicking client from channel..." << WHITE << std::endl;
+		std::cout << YELLOW << "Kicking client from channel..." << WHITE << std::endl;
 		std::vector<Client*> clients = channel->getAllClients();
 		response = ":" + client->getNickname() + "!" + client->getClientname() + "@ft.irc KICK " + channelName + " " + KickedClientNick + " :"+ reason + END;
 		for (size_t i = 0; i < clients.size(); i++)

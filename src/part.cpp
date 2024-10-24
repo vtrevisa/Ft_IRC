@@ -1,55 +1,38 @@
 #include "../includes/Server.hpp"
 
-static bool isValidChannelName(const std::string& channelName) {
-    if (channelName.empty() || channelName[0] != '#')
-        return false;
-
-    return true;
-}
-
-void Server::part(std::vector<std::string> string, int fd) {
+void Server::part(const std::vector<std::string> string, int fd) {
+	Client* client = getClientByFD(fd);
+	std::string reason = "";
 	std::string response;
 
-	//verifica se os parametros estão vazios
-	if (string.size() == 0 || string[0] == "" || string[0] == "PART") {
-		response = "Invalid command\r\nUsage: PART #<channel name>\r\n";
-		send(fd, response.c_str(), response.size(), 0);
+    if (string.empty()) {
+		std::cout << RED << "Error quitting channel..." << WHITE << std::endl;
+		response = IRC + ERR_NEEDMOREPARAMSNBR + " PART " + ERR_NEEDMOREPARAMS + END;
 		return;
+    } else if (string.size() > 1) {
+		for (size_t i = 1; i < string.size(); i++)
+			reason += string[i];
 	}
 
-	Client* client = getClientByFD(fd);
-	bool validChannelName = isValidChannelName(string[0]);
-	if (validChannelName == false) {
-		std::cout << RED << "Error while quitting channel..." << WHITE << std::endl;
-		response = "Invalid channel name\r\nUsage: PART #<channel name>\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
+    std::istringstream iss(string[0]);
+    std::string channelName;
+
+	while (std::getline(iss, channelName, ',')) {
+		Channel* channel = getChannel(channelName);
+		if (channel == NULL) {
+			std::cout << RED << "Error quitting channel..." << WHITE << std::endl;
+			response = IRC + ERR_NOSUCHCHANNELNBR + channelName + ERR_NOSUCHCHANNEL + END;
+			send(fd, response.c_str(), response.size(), 0);
+		} else {
+			std::cout << YELLOW << "Quitting channel..." << WHITE << std::endl;
+			response = ":" + client->getNickname() + "!~" + client->getClientname() + "@* PART " + channelName + " :" + reason + END;
+			std::vector<Client*> clients = channel->getAllClients();
+			for (size_t i = 0; i < clients.size(); i++)
+				send(clients[i]->getFd(), response.c_str(), response.size(), 0);
+		}
+		channel->removeClient(client->getNickname());
+
+		if (channel->getAllClients().size() == 0)
+			deleteChannel(channelName);
 	}
-
-	Channel* channel = getChannel(string[0].substr(1));
-
-	//verifica se o canal existe
-	if (channel == NULL) {
-		std::cout << RED << "Error while quitting channel..." << WHITE << std::endl;
-		response = "Channel does not exist\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	//verifica se o client que chamou o comando está no canal
-	if (!channel->isOnChannel(client->getNickname())) {
-		std::cout << RED << "Error while quitting channel..." << WHITE << std::endl;
-		response = "You must be on the channel to use quit command\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	std::vector<Client*> clients = channel->getAllClients();
-	response = "#" + channel->getName() +
-			   ": " + client->getNickname() + " has quit this channel\r\n";
-	for (size_t i = 0; i < clients.size(); i++)
-		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
-
-	std::cout << YELLOW << "Quitting channel..." << WHITE << std::endl;
-	channel->removeClient(client->getNickname());
 }

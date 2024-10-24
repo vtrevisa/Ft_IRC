@@ -8,10 +8,8 @@ static void splitString(std::string& str, char delimiter, std::vector<std::strin
 }
 
 static bool isValidChannelName(const std::string& channelName) {
-    if (channelName.empty() || channelName[0] != '#') {
+    if (channelName.empty() || channelName[0] != '#')
         return false;
-    }
-
     return true;
 }
 
@@ -22,6 +20,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 	std::vector<std::string> channels;
 
 	if (string[0].empty() || (string.size() > 1 && string[1].empty())) {
+		std::cout << RED << "Error joining channel..." << WHITE << std::endl;
 		response = IRC + ERR_NEEDMOREPARAMSNBR + " JOIN " + ERR_NEEDMOREPARAMS + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
