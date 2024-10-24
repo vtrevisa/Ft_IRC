@@ -4,7 +4,7 @@ void Server::quit(std::vector<std::string> string, int fd) {
 	std::string response;
 
 	//verifica se os parametros estão vazios
-	if (string.size() == 0 || string[0] == "" || string.size() > 1) {
+	if (string.size() == 0 || string[0] == "" || string[0] == "/quit" || string.size() > 1) {
 		response = std::string(RED) + "Invalid number of arguments\r\nUsage: /quit <channel name>\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;

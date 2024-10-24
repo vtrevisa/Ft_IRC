@@ -4,7 +4,7 @@ void Server::topic(std::vector<std::string> string, int fd) {
 	std::string response;
 
 	//verifica se os parametros estão vazios
-	if (string.size() == 0 || string[0] == "" || string.size() > 2) {
+	if (string.size() == 0 || string[0] == "" || string[0] == "/topic" || string.size() > 2) {
 		response = std::string(RED) +
 		"Invalid number of arguments\r\nUsage: /topic <channel name> (optional)<topic in double quotes>\r\n"
 		+ std::string(WHITE);
@@ -25,7 +25,7 @@ void Server::topic(std::vector<std::string> string, int fd) {
 	Client* client = Server::getClientByFD(fd);
 
 	if (string.size() == 1) { //retorna o tópico do canal, caso não seja passado um novo tópico
-		response = std::string(YELLOW) + "#" + channel->getName() + " topic: " + channel->getTopic() + "\r\n";
+		response = std::string(YELLOW) + "#" + channel->getName() + " topic: " + channel->getTopic() + "\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	} else { //verifica o status de operador do usuário que chamou o comando, as restrições de topico e aplica um novo tópico ao canal

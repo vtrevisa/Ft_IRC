@@ -4,7 +4,7 @@ void Server::pmsg(std::vector<std::string> string, int fd) {
 	std::string response;
 	Client* client = getClientByFD(fd);
 
-	if (string.size() == 0 || string[0] == "" || string.size() != 2) {
+	if (string.size() == 0 || string[0] == "" || string[0] == "/pmsg" || string.size() != 2) {
 		response = std::string(RED) +
 				   "Invalid number of arguments\r\nUsage: /psmg <client to send message> <message in double quotes>\r\n"
 				   + std::string(WHITE);

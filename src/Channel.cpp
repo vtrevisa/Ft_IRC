@@ -145,9 +145,11 @@ void Channel::addClient(Client* client) {
 }
 
 void Channel::removeClient(const std::string& nickname) {
-	for (size_t i = 0; i < _clients.size(); ++i)
-		if (_clients[i]->getNickname() == nickname)
+	for (size_t i = 0; i < _clients.size(); ++i) {
+		if (_clients[i]->getNickname() == nickname) {
 			_clients.erase(_clients.begin() + i);
+		}
+	}
 }
 
 // bool Channel::removeClient(const std::string nickname) {

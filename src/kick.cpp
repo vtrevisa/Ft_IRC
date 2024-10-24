@@ -4,7 +4,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	std::string response;
 
 	//verifica se os parametros estão vazios
-	if (string.size() == 0 || string[0] == "" || string.size() > 3) {
+	if (string.size() == 0 || string[0] == "" || string[0] == "/kick" || string.size() > 3) {
 		response = std::string(RED) + "Invalid number of arguments\r\n" +
 				   "Usage: /kick <client to be kicked> <channel name> (optional)<reason in double quotes>\r\n"
 				   + std::string(WHITE);
@@ -62,11 +62,11 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	channel->removeClient(kickedClient->getNickname());
 
 	int kickedClientFD = kickedClient->getFd();
-	response = std::string(YELLOW) + "You were kicked from the channel " + channelName + "\r\nReason: " + reason + "\r\n";
+	response = std::string(YELLOW) + "You were kicked from the channel " + channelName + "\r\nReason: " + reason + "\r\n" + std::string(WHITE);
 	send(kickedClientFD, response.c_str(), response.size(), 0);
 
 	std::vector<Client *> clients = channel->getAllClients();
-	response = std::string(YELLOW) + "#" + channel->getName() + ": " + client->getNickname() + " has been kicked from this channel\r\nReason: " + reason + "\r\n";
+	response = std::string(YELLOW) + "#" + channel->getName() + ": " + client->getNickname() + " has been kicked from this channel\r\nReason: " + reason + "\r\n" + std::string(WHITE);
 	for (size_t i = 0; i < clients.size(); i++)
 		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 }
