@@ -140,7 +140,6 @@ void Channel::removeClient(const std::string& nickname) {
 	// std::vector<Client*> clientList = getAllClients();
 	for (size_t i = 0; i < _clients.size(); ++i) {
 		if (_clients[i]->getNickname() == nickname) {
-			std::cout << "yay\n" << std::endl;
 			_clients.erase(_clients.begin() + i);
 			decreaseClientCount();
 		}
