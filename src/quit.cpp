@@ -1,14 +1,7 @@
 #include "Server.hpp"
 
-void	Server::quit(std::vector<std::string> string, int fd) {
-	std::string response = "Goodbye!\r\n";
+void	Server::quit(int fd) {
 	Client* client = getClientByFD(fd);
-
-	if (string.size() == 0 || string[0] == "" || string[0] == "QUIT" || string.size() > 1) {
-		response = "Invalid command\r\nUsage: QUIT\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
 
 	// procura e remove o client de todos os canais
 	std::vector<Channel*> channels = getAllChannels();
@@ -22,7 +15,6 @@ void	Server::quit(std::vector<std::string> string, int fd) {
 		}
 	}
 
-	send(fd, response.c_str(), response.size(), 0);
 	std::cout << RED << "Client <" << client->getNickname() << "> Disconnected" << WHITE << std::endl;
 	close(fd);
 	ClearClients(fd);

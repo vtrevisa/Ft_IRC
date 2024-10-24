@@ -313,7 +313,7 @@ void Server::identifyCommand(std::string string, int fd)
 				join(parseCommand(parsedCommand), fd);
 				break;
 			case 5:
-				quit(parseCommand(parsedCommand), fd);
+				quit(fd);
 				break;
 			case 6:
 				pmsg(parseCommand(parsedCommand), fd);

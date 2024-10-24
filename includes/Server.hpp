@@ -54,7 +54,7 @@ class Server //-> class for server
 		void						topic(std::vector<std::string> string, int fd); //done
 		void						kick(std::vector<std::string> string, int fd); //done
 		void						join(std::vector<std::string> string, int fd); //done
-		void						quit(std::vector<std::string> string, int fd); //done
+		void						quit(int fd); //done
 		void						help(std::vector<std::string> string, int fd); //done
 		void						pmsg(std::vector<std::string> string, int fd); //done
 		void						part(std::vector<std::string> string, int fd); //done

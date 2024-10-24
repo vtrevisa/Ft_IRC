@@ -5,9 +5,7 @@ void Server::pass(std::vector<std::string> string, int fd) {
 	std::string response;
 	
 	if(string.size() == 0 || string[0] == "PASS" || string.size() != 1) {
-		response = 
-				   "Invalid\r\nUsage: PASS <password>\r\n"
-				  ;
+		response = "Invalid\r\nUsage: PASS <password>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
