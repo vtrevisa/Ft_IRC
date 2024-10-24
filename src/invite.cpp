@@ -1,82 +1,63 @@
 #include "../includes/Server.hpp"
 
-static bool isValidChannelName(const std::string& channelName) {
-    if (channelName.empty() || channelName[0] != '#')
-        return false;
-
-    return true;
-}
-
-void Server::invite(std::vector<std::string> string, int fd) {
+void Server::invite(const std::vector<std::string> string, int fd) {
 	std::string response;
-
-	//verifica se os parametros estão vazios
-	if (string.size() == 0 || string[0] == "" || string[0] == "INVITE" || string.size() > 2) {
-		response = "Invalid command\r\nUsage: INVITE <client to be invited> #<channel name>\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
 	Client* client = getClientByFD(fd);
 
-	bool validChannelName = isValidChannelName(string[1]);
-	if (validChannelName == false) {
-		std::cout << RED << "Error while inviting to channel..." << WHITE << std::endl;
-		response = "Invalid channel name\r\nUsage: INVITE <client to be invited> #<channel name>\r\n";
+    if (string.size() == 0 || string[0] == "") {
+		response = IRC + ERR_NEEDMOREPARAMSNBR + " INVITE " + ERR_NEEDMOREPARAMS + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
-	}
+    }
 
-	Channel* channel = getChannel(string[1].substr(1));
-	const std::string& channelName = string[1].substr(1);
+    const std::string& channelName = string[1];
+    Channel* channel = getChannel(channelName);
 
-	//verifica se o canal existe
-	if (channel == NULL) {
-		std::cout << RED << "Error while inviting to channel..." << WHITE << std::endl;
-		response = "Channel does not exist\r\n";
+    if (channel == NULL) {
+		response = IRC + ERR_NOSUCHCHANNELNBR + "! " + channelName +  ERR_NOSUCHCHANNEL + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
-	}
+    }
 
-	//verifica se o client que chamou o comando está no canal
-	if (!channel->isOnChannel(client->getNickname())) {
-		std::cout << RED << "Error while inviting to channel..." << WHITE << std::endl;
-		response = "You must be on the channel to use invite command\r\n";
+    if (!channel->isOnChannel(client->getNickname())) {
+		response = IRC + ERR_NOTONCHANNELNBR + channelName + " " + channelName + ERR_NOTONCHANNEL + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
-	}
+    }
 
-	//verifica se o client que chamou o comando é operador no canal
-	if (!channel->isOperator(client->getNickname())) {
-		std::cout << RED << "Error while inviting to channel..." << WHITE << std::endl;
-		response = "You don't have operator privileges on this channel\r\n";
+	std::istringstream iss(string[0]);
+	std::string invitedClientNickname;
+	while (std::getline(iss, invitedClientNickname, ',')) {
+		Client* invitedClient = getClientByNick(invitedClientNickname);
+		if (invitedClient == NULL) {
+			response = IRC + ERR_NOSUCHNICKNBR + " " + channelName + " " + invitedClientNickname + ERR_NOSUCHNICK + END;
+			send(fd, response.c_str(), response.size(), 0);
+			continue;
+		}
+
+		if (channel->isOnChannel(invitedClientNickname))
+		{
+			response = IRC + ERR_USERONCHANNELNBR + channelName + " " + invitedClientNickname + " " + channelName + ERR_USERONCHANNEL + END;
+			send(fd, response.c_str(), response.size(), 0);
+			continue;
+		}
+
+		if (!channel->isOperator(client->getNickname())) {
+			response = IRC + ERR_CHANOPRIVSNEEDEDNBR + client->getNickname() + " " + channelName + ERR_CHANOPRIVSNEEDED + END;
+			send(fd, response.c_str(), response.size(), 0);
+			return;
+		}
+
+		channel->addToInviteList(invitedClientNickname);
+		response = IRC + RPL_INVITINGNBR + channelName + " " + invitedClientNickname  + " " + channelName + END;
 		send(fd, response.c_str(), response.size(), 0);
-		return;
+
+		response = ":" + client->getNickname() + " INVITE " + invitedClientNickname + " " + channelName + END;
+		int invitedClientFD = invitedClient->getFd();
+		send(invitedClientFD, response.c_str(), response.size(), 0);
+
+		std::vector<Client*> operators = channel->getOperators();
+		for (size_t i = 0; i < operators.size(); i++)
+			send(client->getFd(), response.c_str(), response.size(), 0);
 	}
-
-	//verifica se o client convidado existe
-	Client* invitedClient = getClientByNick(string[0]);
-	if (invitedClient == NULL) {
-		std::cout << RED << "Error while inviting to channel..." << WHITE << std::endl;
-		response = "This client does not exist\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	//verifica se o client convidado já esta no canal
-	if (channel->isOnChannel(invitedClient->getNickname())) {
-		std::cout << RED << "Error while inviting to channel..." << WHITE << std::endl;
-		response = "This client is already on this channel\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	channel->addToInviteList(invitedClient->getNickname());
-
-	int invitedClientFD = invitedClient->getFd();
-	response = client->getNickname() +
-				" sent you an invite to enter the chanel " +
-				channelName + "\r\n";
-	send(invitedClientFD, response.c_str(), response.size(), 0);
-	std::cout << YELLOW << "Sending invite..." << WHITE << std::endl;
 }
