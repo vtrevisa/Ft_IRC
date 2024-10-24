@@ -277,7 +277,7 @@ void Server::identifyCommand(std::string string, int fd)
 	do {
 		int i = 0;
 		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));
-	
+		std::cout << string << std::endl;
 		//loop que vai identificar o comando
 		for (; i < 12; i++) //substituir XXXX pelo numero de comandos totais descritos acima
 			if(command == requests[i])
@@ -287,7 +287,7 @@ void Server::identifyCommand(std::string string, int fd)
 		if(client->isAuth() == false) {
 			if (i != 8 && i != 9 && i != 10 && i != 11) {
 				std::cout << i << std::endl;
-				std::string response = "You have not registered\r\nYou must set a nickname, a username and the server password\r\n";
+				std::string response = "You have not registered\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				client->clientBuff.clear();
 				return;

@@ -5,7 +5,7 @@ void Server::username(std::vector<std::string> string, int fd) {
 	
 	//verifica linha de comando passada
 	if (string.size() > 1) {
-		response = std::string(RED) + "Invalid command\r\nUsage: USER (optional)<username>\r\n" + std::string(WHITE);
+		response = std::string(RED) + "Invalid command\r\nUsage: USER <username>\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}

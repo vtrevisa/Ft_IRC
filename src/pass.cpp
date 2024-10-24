@@ -18,6 +18,7 @@ void Server::pass(std::vector<std::string> string, int fd) {
 		std::cout << GREEN << "Client <" << client->getFd() << "> Connected!" << WHITE << std::endl;
 		std::string response = std::string(GREEN) + "Password accepted!\r\n" + std::string(WHITE);;
 		send(client->getFd(), response.c_str(), response.size(), 0);
+		client->setPassword(receivedPassword);
 	} else {
 		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHITE << std::endl;
 		std::string response = std::string(RED) + "Password incorrect!\r\n" + std::string(WHITE);
