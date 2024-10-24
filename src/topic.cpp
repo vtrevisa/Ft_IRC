@@ -1,86 +1,71 @@
 #include "../includes/Server.hpp"
 
-static bool isValidChannelName(const std::string& channelName) {
-    if (channelName.empty() || channelName[0] != '#')
-        return false;
+std::string parseTopic(std::vector<std::string> string) {
+	std::string message;
+	if (string.size() < 2 || string[1] == "") {
+		message = "";
+		return message;
+	}
 
-    return true;
-}
-
-static bool isValidTopic(const std::string& channelName) {
-    if (channelName.empty() || channelName[0] != ':')
-        return false;
-
-    return true;
+	if (string[1].find(':') == 0) {
+		message = string[1].substr(1) + " ";
+		for (size_t i = 2; i < string.size(); i++)
+			message += string[i] + " ";
+		return message;
+	}
+	message = string[1].substr(0) + " ";
+	for (size_t i = 2; i < string.size(); i++)
+		message += string[i] + " ";
+	return message;
 }
 
 void Server::topic(std::vector<std::string> string, int fd) {
 	std::string response;
-
-	//verifica se os parametros estão vazios
-	if (string.size() == 0 || string[0] == "" || string[0] == "TOPIC" || string.size() > 2) {
-		response = "Invalid command\r\nUsage: TOPIC #<channel name> (optional)<topic>\r\n"
-		+ std::string(WHITE);
+	if (string.size() == 0 || string[0] == "") {
+		std::cout << RED << "Error setting topic channel..." << WHITE << std::endl;
+		response = IRC + ERR_NEEDMOREPARAMSNBR + " TOPIC " + ERR_NEEDMOREPARAMS + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
+	std::string channelName = string[0];
+	Channel* channel = getChannel(channelName);
 
-	bool validChannelName = isValidChannelName(string[0]);
-	if (validChannelName == false) {
-		std::cout << RED << "Error getting channel topic..." << WHITE << std::endl;
-		response = "Invalid channel name\r\nUsage: TOPIC #<channel name> (optional):<topic>\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-	
-	std::string channelName = string[0].substr(1);
-	Channel* channel = getChannel(string[0].substr(1));
-
-	//verifica se o canal existe
 	if (channel == NULL) {
-		std::cout << RED << "Error getting channel topic..." << WHITE << std::endl;
-		response = "Channel does not exist\r\n";
+		std::cout << RED << "Error quitting channel..." << WHITE << std::endl;
+		response = IRC + ERR_NOSUCHCHANNELNBR + channelName + ERR_NOSUCHCHANNEL + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
-	Client* client = Server::getClientByFD(fd);
+	Client* client = getClientByFD(fd);
 
-	if (string.size() == 1) { //retorna o tópico do canal, caso não seja passado um novo tópico
-		std::cout << YELLOW << "Getting channel topic..." << WHITE << std::endl;
-		response = "#" + channel->getName() + " topic: " + channel->getTopic() + "\r\n";
+	std::string topic = parseTopic(string);
+	if (topic == "") {
+		if(channel->getTopic().empty()) {
+			std::cout << RED << "Error quitting channel..." << WHITE << std::endl;
+			response = IRC + RPL_NOTOPICNBR + client->getNickname() + " " + channelName + RPL_NOTOPIC + END;
+			send (fd, response.c_str(), response.size(), 0);
+			return;
+		}
+
+		std::cout << YELLOW << "Showing topic..." << WHITE << std::endl;
+		response = IRC + RPL_TOPICNBR + client->getNickname() + " " + channelName + " :" + channel->getTopic() + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
-	} else { //verifica o status de operador do usuário que chamou o comando, as restrições de topico e aplica um novo tópico ao canal
-		if (!isValidTopic(string[1])) {
-			std::cout << RED << "Error getting channel topic..." << WHITE << std::endl;
-			response = "Invalid topic\r\nUsage: TOPIC #<channel name> (optional):<topic>\\r\n";
-			send(fd, response.c_str(), response.size(), 0);
-			return;
-		}
-		std::string topic = string[1].substr(1);
 
-		//verifica se o client que chamou o comando está no canal
-		if (!channel->isOnChannel(client->getNickname())) {
-			std::cout << RED << "Error getting channel topic..." << WHITE << std::endl;
-			response = "You must be on the channel to set a topic\r\n";
+	} else {
+		if(channel->getMode("t") == true && !channel->isOperator(client->getNickname())) {
+			std::cout << RED << "Error quitting channel..." << WHITE << std::endl;
+			response = IRC + ERR_CHANOPRIVSNEEDEDNBR + client->getNickname() + " " + channelName + ERR_CHANOPRIVSNEEDED + END;
 			send(fd, response.c_str(), response.size(), 0);
 			return;
 		}
 
-		if (channel->getMode("t") == true && !channel->isOperator(client->getNickname())) {
-			std::cout << RED << "Error getting channel topic..." << WHITE << std::endl;
-			response = "The topic restrictions are set on this channel\r\nYou must have operator privileges\r\n";
-			send(fd, response.c_str(), response.size(), 0);
-			return;
-		}
+		std::cout << YELLOW << "Setting topic..." << WHITE << std::endl;
 		channel->setTopic(topic);
 
 		std::vector<Client*> clients = channel->getAllClients();
-		std::cout << YELLOW << "Setting channel topic..." << WHITE << std::endl;
-		response = "#" + channel->getName() +
-				   ": " + client->getNickname() + " has set this channel topic to: " + channel->getTopic()
-				   + "\r\n";
+		response = ":" + client->getNickname() + "!~" + client->getClientname() + "@ft.irc TOPIC " + channelName + " " + topic + END;
 		for (size_t i = 0; i < clients.size(); i++)
 			send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 	}
