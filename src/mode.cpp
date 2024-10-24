@@ -167,8 +167,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 	}
 
 	response = std::string(YELLOW) + "#" + channel->getName() +
-			   ": " + client->getNickname() + " has set this channel topic to: " +
-			   channel->getTopic() + "\r\n"
+			   ": " + client->getNickname() + "alterar a mensagem que aparece aqui"
 			   + std::string(WHITE);
 	std::vector<Client *> clients = channel->getAllClients();
 	for (size_t i = 0; i < clients.size(); i++)
