@@ -1,7 +1,7 @@
 #include "../includes/Server.hpp"
 
 void Server::username(std::vector<std::string> string, int fd) {
-	Client* client = Server::getClientByFD(fd);
+	Client* client = getClientByFD(fd);
 	if(client == NULL)
 		return;
 	std::vector<Client*> clients = getAllClients();
@@ -23,10 +23,11 @@ void Server::username(std::vector<std::string> string, int fd) {
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
+
+	std::cout << YELLOW << "Setting username..." << WHITE << std::endl;
 	client->setClientname(username);
 	
 	if(client->isAuth() == true) {
-		std::cout << YELLOW << "Setting username..." << WHITE << std::endl;
 		response = IRC + RPL_WELCOMENBR + client->getNickname() + RPL_WELCOME + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;

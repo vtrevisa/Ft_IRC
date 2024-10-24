@@ -16,7 +16,7 @@ std::string parseMessage(std::vector<std::string> string) {
 
 void Server::pmsg(std::vector<std::string> string, int fd) {
 	std::string response;
-	Client* client = Server::getClientByFD(fd);
+	Client* client = getClientByFD(fd);
 	std::string channelName = string[0].substr(0, string[0].find(' '));
 
 	if (string.size() < 1 || channelName.empty()) {

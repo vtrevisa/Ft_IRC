@@ -147,7 +147,7 @@ void Server::ReceiveNewData(int fd) {
 	// 	return;
 
 	// if (buff[0] == '/')
-	Server::identifyCommand(buff, fd);
+	identifyCommand(buff, fd);
 	// else
 	// 	std::cout << "Client <" << fd << "> says: " << buff << std::endl;
 }
@@ -259,7 +259,7 @@ std::vector<std::string> splitstr(std::string string) {
 void Server::identifyCommand(std::string string, int fd)
 {
 	std::vector<std::string> splittedStr = splitstr(string);
-	Client* client = Server::getClientByFD(fd);
+	Client* client = getClientByFD(fd);
 	std::string requests[] = {"MODE",
 							  "INVITE",
 							  "TOPIC",
