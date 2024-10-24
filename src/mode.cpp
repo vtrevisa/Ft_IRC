@@ -172,7 +172,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 	response = "#" + channel->getName() +
 			   ": " + client->getNickname() + "#" + channel->getName() + ": " + client->getNickname() + " has changed mode setting\r\n"
 			  ;
-	std::vector<Client *> clients = channel->getAllClients();
+	std::vector<Client*> clients = channel->getAllClients();
 	for (size_t i = 0; i < clients.size(); i++)
 		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 }

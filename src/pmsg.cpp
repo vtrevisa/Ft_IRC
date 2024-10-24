@@ -55,7 +55,7 @@ void Server::pmsg(std::vector<std::string> string, int fd) {
 
 	response = client->getNickname() + " to #" + channelName + " :" + message + "\r\n";
 	std::cout << YELLOW << "Sending message..." << WHITE << std::endl;
-	std::vector<Client *> clients = channel->getAllClients();
+	std::vector<Client*> clients = channel->getAllClients();
 	for (size_t i = 0; i < clients.size(); i++)
 		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 }

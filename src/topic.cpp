@@ -76,7 +76,7 @@ void Server::topic(std::vector<std::string> string, int fd) {
 		}
 		channel->setTopic(topic);
 
-		std::vector<Client *> clients = channel->getAllClients();
+		std::vector<Client*> clients = channel->getAllClients();
 		std::cout << YELLOW << "Setting channel topic..." << WHITE << std::endl;
 		response = "#" + channel->getName() +
 				   ": " + client->getNickname() + " has set this channel topic to: " + channel->getTopic()

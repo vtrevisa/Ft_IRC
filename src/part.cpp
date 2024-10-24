@@ -44,7 +44,7 @@ void Server::part(std::vector<std::string> string, int fd) {
 		return;
 	}
 
-	std::vector<Client *> clients = channel->getAllClients();
+	std::vector<Client*> clients = channel->getAllClients();
 	response = "#" + channel->getName() +
 			   ": " + client->getNickname() + " has quit this channel\r\n";
 	for (size_t i = 0; i < clients.size(); i++)

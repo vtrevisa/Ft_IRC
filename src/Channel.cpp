@@ -123,7 +123,7 @@ bool Channel::isOperator(const std::string nickname) const {
 bool Channel::isOnChannel(const std::string nickname) const {
 	bool isOnChannel = false;
 
-	std::vector<Client *> clients = getAllClients();
+	std::vector<Client*> clients = getAllClients();
 	for (size_t i = 0; i < clients.size(); i++)
 		if (nickname == clients[i]->getNickname())
 			isOnChannel = true;
