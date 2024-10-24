@@ -271,13 +271,14 @@ void Server::identifyCommand(std::string string, int fd)
 							  "NICK",
 							  "USER",
 							  "CAP",
-							  "PASS"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
+							  "PASS"};
 	do {
 		int i = 0;
+		std::cout << string << std::endl;
 		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));
 		std::cout << string << std::endl;
 		//loop que vai identificar o comando
-		for (; i < 12; i++) //substituir XXXX pelo numero de comandos totais descritos acima
+		for (; i < 12; i++)
 			if(command == requests[i])
 				break;
 	
@@ -294,11 +295,6 @@ void Server::identifyCommand(std::string string, int fd)
 
 		std::string parsedCommand = splittedStr[0].substr(splittedStr[0].find_first_of(" ") + 1);
 
-		//cada comando vai ser um case diferente, então é só chamar o método correspondente em cada caso
-		//ex: case 0:
-		//kick(parseCommand(parsedCommand), ...); break;
-		//case 1:
-		//join(parseCommand(parsedCommand), ...); break;
 		std::string response;
 		switch (i) {
 			case 0:

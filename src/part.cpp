@@ -46,8 +46,7 @@ void Server::part(std::vector<std::string> string, int fd) {
 
 	std::vector<Client *> clients = channel->getAllClients();
 	response = "#" + channel->getName() +
-			   ": " + client->getNickname() + " has quit this channel\r\n"
-			  ;
+			   ": " + client->getNickname() + " has quit this channel\r\n";
 	for (size_t i = 0; i < clients.size(); i++)
 		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 
