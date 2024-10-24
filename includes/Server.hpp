@@ -26,7 +26,7 @@ class Server //-> class for server
 		void						ServerInit(int port, std::string passwd); //-> server initialization
 		void						SerSocket(); //-> server socket creation
 		void						AcceptNewClient(); //-> accept new client
-		void						Authentication(Client* client); //-> authenticate the client
+		// void						Authentication(Client* client); //-> authenticate the client
 		void						ReceiveNewData(int fd); //-> receive new data from a registered client
 
 		static void					SignalHandler(int signum); //-> signal handler
@@ -60,6 +60,8 @@ class Server //-> class for server
 		void						part(std::vector<std::string> string, int fd); //done
 		void						nickname(std::vector<std::string> nick, int fd); //done
 		void						username(std::vector<std::string> string, int fd); //done
+		void						cap(int fd); //done
+		void						pass(std::vector<std::string> string, int fd); //done
 };
 
 #endif

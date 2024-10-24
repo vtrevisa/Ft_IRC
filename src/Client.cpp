@@ -50,3 +50,9 @@ std::string Client::getPassword() {
 status Client::getStatus() {
 	return _status;
 }
+
+bool Client::isAuth() {
+	if(this->_clientname.empty() || this->_nickname.empty() || this->_password.empty())
+		return false;
+	return true;
+}

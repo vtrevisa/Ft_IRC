@@ -36,6 +36,7 @@ class Client //-> class for client
 		int			getFd(); //-> getter for fd
 		status		getStatus();
 		std::string	getPassword();
+		bool		isAuth();
 };
 
 #endif

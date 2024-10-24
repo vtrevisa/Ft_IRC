@@ -2,7 +2,7 @@
 
 NAME = ircserv
 SRC = main.cpp Server.cpp Client.cpp Channel.cpp mode.cpp invite.cpp kick.cpp topic.cpp\
-		join.cpp part.cpp help.cpp pmsg.cpp quit.cpp nickname.cpp username.cpp
+		join.cpp part.cpp help.cpp pmsg.cpp quit.cpp nickname.cpp username.cpp pass.cpp cap.cpp
 
 #----DIRS--------------------------------------------------------------------------------------
 OBJ_DIR = obj
