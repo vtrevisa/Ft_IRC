@@ -19,9 +19,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 
 	//verifica se os parametros estão vazios
 	if (string.size() == 0 || string[0] == "" || string[0] == "KICK" || string.size() > 3) {
-		response = std::string(RED) + "Invalid command\r\n" +
-				   "Usage: KICK #<channel name>  <client to be kicked> (optional):<reason>\r\n"
-				   + std::string(WHITE);
+		response = "Invalid command\r\nUsage: KICK #<channel name>  <client to be kicked> (optional):<reason>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -30,7 +28,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	bool validChannelName = isValidChannelName(string[0]);
 	if (validChannelName == false) {
 		std::cout << RED << "Error while kicking client from channel..." << WHITE << std::endl;
-		response = std::string(RED) + "Invalid channel name\r\nUsage: KICK #<channel name> <client to be kicked> (optional):<reason>\r\n" + std::string(WHITE);
+		response = "Invalid channel name\r\nUsage: KICK #<channel name> <client to be kicked> (optional):<reason>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -40,7 +38,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	//verifica se o canal existe
 	if (channel == NULL) {
 		std::cout << RED << "Error while kicking client from channel..." << WHITE << std::endl;
-		response = std::string(RED) + "Channel does not exist\r\n" + std::string(WHITE);
+		response = "Channel does not exist\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -48,7 +46,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	//verifica se o client que chamou o comando está no canal
 	if (!channel->isOnChannel(client->getNickname())) {
 		std::cout << RED << "Error while kicking client from channel..." << WHITE << std::endl;
-		response = std::string(RED) + "You must be on the channel to use kick command\r\n" + std::string(WHITE);
+		response = "You must be on the channel to use kick command\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -56,7 +54,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	//verifica se o client que chamou o comando é operador no canal
 	if (!channel->isOperator(client->getNickname())) {
 		std::cout << RED << "Error while kicking client from channel..." << WHITE << std::endl;
-		response = std::string(RED) + "You don't have operator privileges on this channel\r\n" + std::string(WHITE);
+		response = "You don't have operator privileges on this channel\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -65,7 +63,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	Client* kickedClient = getClientByNick(string[1]);
 	if (kickedClient == NULL) {
 		std::cout << RED << "Error while kicking client from channel..." << WHITE << std::endl;
-		response = std::string(RED) + "This client does not exist\r\n" + std::string(WHITE);
+		response = "This client does not exist\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -73,7 +71,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	//verifica se o client a ser expulso esta no canal
 	if (!channel->isOnChannel(kickedClient->getNickname())) {
 		std::cout << RED << "Error while kicking client from channel..." << WHITE << std::endl;
-		response = std::string(RED) + "This client is not on this channel\r\n" + std::string(WHITE);
+		response = "This client is not on this channel\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -84,7 +82,7 @@ void Server::kick(std::vector<std::string> string, int fd) {
 	if (string.size() == 3) {
 		if (!isValidReason(string[2])) {
 			std::cout << RED << "Error while kicking client from channel..." << WHITE << std::endl;
-			response = std::string(RED) + "Invalid reason\r\nUsage: KICK #<channel name> <client to be kicked> (optional):<reason>\r\n" + std::string(WHITE);
+			response = "Invalid reason\r\nUsage: KICK #<channel name> <client to be kicked> (optional):<reason>\r\n";
 			send(fd, response.c_str(), response.size(), 0);
 			return;
 		}
@@ -94,11 +92,11 @@ void Server::kick(std::vector<std::string> string, int fd) {
 		reason = ": no reason";
 
 	// int kickedClientFD = kickedClient->getFd();
-	// response = std::string(YELLOW) + "You were kicked from the channel " + channel->getName() + "\r\nReason: " + reason + "\r\n" + std::string(WHITE);
+	// response = "You were kicked from the channel " + channel->getName() + "\r\nReason: " + reason + "\r\n";
 	// send(kickedClientFD, response.c_str(), response.size(), 0);
 
 	std::vector<Client *> clients = channel->getAllClients();
-	response = std::string(YELLOW) + "#" + channel->getName() + ": " + client->getNickname() + " has been kicked from this channel\r\nReason: " + reason + "\r\n" + std::string(WHITE);
+	response = "#" + channel->getName() + ": " + client->getNickname() + " has been kicked from this channel\r\nReason: " + reason + "\r\n";
 	for (size_t i = 0; i < clients.size(); i++)
 		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 

@@ -13,16 +13,14 @@ void Server::mode(std::vector<std::string> string, int fd) {
 	Client* client = getClientByFD(fd);
 
 	if (string.size() == 0 || string[0] == "" || string[0] == "MODE" || string.size() > 4) {
-		response = std::string(RED) +
-				"You must provide a client to be demoted\r\nUsage: MODE #<channel name> +/-<mode> <option>\r\n"
-				+ std::string(WHITE);
+		response = "You must provide a client to be demoted\r\nUsage: MODE #<channel name> +/-<mode> <option>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	bool validChannelName = isValidChannelName(string[0]);
 	if (validChannelName == false) {
-		response = std::string(RED) + "Invalid channel name\r\nUsage: MODE #<channel name> +/-<mode> <option>\r\n" + std::string(WHITE);
+		response = "Invalid channel name\r\nUsage: MODE #<channel name> +/-<mode> <option>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -32,21 +30,21 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 	//verifica se o canal existe no server
 	if (channel == NULL) {
-		response = std::string(RED) + "Channel does not exist\r\n" + std::string(WHITE);
+		response = "Channel does not exist\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	//verifica se o client que chamou o comando está no canal
 	if (!channel->isOnChannel(client->getNickname())) {
-		response = std::string(RED) + "You must be on the channel to use mode command\r\n" + std::string(WHITE);
+		response = "You must be on the channel to use mode command\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	//verifica se o usuário é um operador
 	if (!channel->isOperator(client->getNickname())) {
-		response = std::string(RED) + "You don't have operator privileges on this channel\r\n" + std::string(WHITE);
+		response = "You don't have operator privileges on this channel\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -54,7 +52,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 	//verifica se o usuário enviou um modo para alterar, caso não tenha enviado, retorna a lista de modos ativos no canal
 	if (string.size() == 1 || string[1] == "") {
 		std::string modes = channel->getAllModes();
-		response = std::string(YELLOW) + "#" + channel->getName() + ": Modes on this channel: "+ modes + "\r\n" + std::string(WHITE);
+		response = "#" + channel->getName() + ": Modes on this channel: "+ modes + "\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -97,9 +95,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 5:			
 			if (modeArg == "") {
-				response = std::string(RED) +
-				"You must provide a password to be set\r\nUsage: MODE #<channel name> +k <password>\r\n"
-				+ std::string(WHITE);
+				response = "You must provide a password to be set\r\nUsage: MODE #<channel name> +k <password>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -109,23 +105,19 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 6:
 			if (modeArg == "") {
-				response = std::string(RED) +
-				"You must provide a client to be demoted\r\nUsage: MODE #<channel name> -o <nickname>\r\n"
-				+ std::string(WHITE);
+				response = "You must provide a client to be demoted\r\nUsage: MODE #<channel name> -o <nickname>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (clientArg == NULL) {
-				response = std::string(RED) + "This client is not on this channel\r\n"
-				+ std::string(WHITE);
+				response = "This client is not on this channel\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (!channel->isOperator(clientArg->getNickname())) {
-				response = std::string(RED) + "This client is not an operator on this channel\r\n"
-				+ std::string(WHITE);
+				response = "This client is not an operator on this channel\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -135,21 +127,19 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 7:
 			if (modeArg == "") {
-				response = std::string(RED) +
-				"You must provide a client to be promoted\r\nUsage: MODE #<channel name> +o <nickname>\r\n"
-				+ std::string(WHITE);
+				response = "You must provide a client to be promoted\r\nUsage: MODE #<channel name> +o <nickname>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (clientArg == NULL) {
-				response = std::string(RED) + "This client is not on this channel\r\n" + std::string(WHITE);
+				response = "This client is not on this channel\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
 
 			if (channel->isOperator(clientArg->getNickname())) {
-				response = std::string(RED) + "This client is already an operator on this channel\r\n" + std::string(WHITE);
+				response = "This client is already an operator on this channel\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -164,9 +154,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 
 		case 9:
 			if (modeArg == "") {
-				response = std::string(RED) +
-				"You must provide a limit to be set\r\nUsage: MODE #<channel name> +l <limit>\r\n"
-				+ std::string(WHITE);
+				response =  "You must provide a limit to be set\r\nUsage: MODE #<channel name> +l <limit>\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				return;
 			}
@@ -177,13 +165,13 @@ void Server::mode(std::vector<std::string> string, int fd) {
 			break;
 
 		default:
-			response = std::string(RED) + "Invalid mode\r\n" + std::string(WHITE);
+			response = "Invalid mode\r\n";
 			break;
 	}
 
-	response = std::string(YELLOW) + "#" + channel->getName() +
+	response = "#" + channel->getName() +
 			   ": " + client->getNickname() + "#" + channel->getName() + ": " + client->getNickname() + " has changed mode setting\r\n"
-			   + std::string(WHITE);
+			  ;
 	std::vector<Client *> clients = channel->getAllClients();
 	for (size_t i = 0; i < clients.size(); i++)
 		send(clients[i]->getFd(), response.c_str(), response.size(), 0);

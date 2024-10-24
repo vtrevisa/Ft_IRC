@@ -15,7 +15,7 @@ void	Server::nickname(std::vector<std::string> nick, int fd)
 		if (client->getNickname() == "")
 			response = "You don't have a nickname yet\r\n";
 		else
-			response = "Your nickname is " + client->getNickname() + "\r\n" + std::string(WHITE);
+			response = "Your nickname is " + client->getNickname() + "\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -33,7 +33,7 @@ void	Server::nickname(std::vector<std::string> nick, int fd)
 			}
 		}
 		client->setNickname(nick[0]);
-		response = "Nickname changed to " + nick[0] + "\r\n" + std::string(WHITE);
+		response = "Nickname changed to " + nick[0] + "\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 	}
 }

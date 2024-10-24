@@ -11,9 +11,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 	std::string response;
 
 	if (string.size() == 0 || string[0] == "" || string[0] == "JOIN" || string.size() > 2) {
-		response = std::string(RED) + 
-				   "Invalid command\r\nUsage: JOIN #<channel name> (optional)<password>\r\n"
-				   + std::string(WHITE);
+		response = "Invalid command\r\nUsage: JOIN #<channel name> (optional)<password>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -22,7 +20,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 	bool validChannelName = isValidChannelName(string[0]);
 	if (validChannelName == false) {
 		std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
-		response = std::string(RED) + "Invalid channel name\r\nUsage: JOIN #<channel name> (optional)<password>\r\n" + std::string(WHITE);
+		response = "Invalid channel name\r\nUsage: JOIN #<channel name> (optional)<password>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -42,7 +40,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 			channel->removeFromInviteList(client->getNickname());
 		} else {
 			std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
-			response = std::string(RED) + "You have not been invited for this channel\r\n" + std::string(WHITE);
+			response = "You have not been invited for this channel\r\n";
 			send(fd, response.c_str(), response.size(), 0);
 			return;
 		}
@@ -52,7 +50,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 	//verifica se o canal possui senha
 	if (!channelPassword.empty() && string.size() == 1) {
 		std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
-		response = std::string(RED) + "You must provide a password to join this channel\r\n" + std::string(WHITE);
+		response = "You must provide a password to join this channel\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -62,7 +60,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 		//verifica se a senha é a correta
 		if (!channelPassword.empty() && channelPassword != password) {
 			std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
-			response = std::string(RED) + "Wrong password\r\n" + std::string(WHITE);
+			response = "Wrong password\r\n";
 			send(fd, response.c_str(), response.size(), 0);
 			return;
 		}
@@ -70,7 +68,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 
 	if (channel->isOnChannel(client->getNickname()) == true) {
 		std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
-		response = std::string(RED) + "You are already on this channel" + std::string(WHITE);
+		response = "You are already on this channel\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -81,8 +79,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 		std::cout << YELLOW << "Joining channel..." << WHITE << std::endl;
 	} else {
 		std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
-		response = std::string(RED) + "You cannot join this channel\r\nThis channel has reached the client limit\r\n" 
-				   + std::string(WHITE);
+		response = "You cannot join this channel\r\nThis channel has reached the client limit\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -91,9 +88,8 @@ void Server::join(std::vector<std::string> string, int fd) {
 		channel->promoteToOperator(client->getNickname());
 
 	std::vector<Client *> clients = channel->getAllClients();
-	response = std::string(YELLOW) + "#" + channel->getName() + ": " +
-				client->getNickname() + " has joined this channel\r\n" +
-				std::string(WHITE);
+	response = "#" + channel->getName() + ": " +
+				client->getNickname() + " has joined this channel\r\n";
 	for (size_t i = 0; i < clients.size(); i++)
 	{
 		std::cout << "I = " << i <<std::endl;
@@ -104,9 +100,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 			send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 		else 
 		{
-			response = response = std::string(YELLOW) + "#" + channel->getName() + ": " +
-							" you joined this channel\r\n" +
-						std::string(WHITE);
+			response = "#" + channel->getName() + ": you joined this channel\r\n";
 			send(client->getFd(), response.c_str(), response.size(), 0);
 		}
 	}

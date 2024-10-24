@@ -96,8 +96,6 @@ void Server::AcceptNewClient() {
 	_fds.push_back(NewPoll); //-> add the client socket to the pollfd
 
 	std::cout << YELLOW << "Client <" << incofd << "> requested connection" << WHITE << std::endl; // Accept the client
-	std::string passwordRequest = "Please enter the password:\r\n";
-	send(incofd, passwordRequest.c_str(), passwordRequest.size(), 0);
 }
 
 // void Server::Authentication(Client* client)

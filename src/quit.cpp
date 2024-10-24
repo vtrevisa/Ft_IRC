@@ -5,7 +5,7 @@ void	Server::quit(std::vector<std::string> string, int fd) {
 	Client* client = getClientByFD(fd);
 
 	if (string.size() == 0 || string[0] == "" || string[0] == "QUIT" || string.size() > 1) {
-		response = std::string(RED) + "Invalid command\r\nUsage: QUIT\r\n";
+		response = "Invalid command\r\nUsage: QUIT\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}

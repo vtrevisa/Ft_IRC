@@ -21,16 +21,14 @@ void Server::pmsg(std::vector<std::string> string, int fd) {
 	Client* client = getClientByFD(fd);
 
 	if (string.size() == 0 || string[0] == "" || string[0] == "PRIVMSG" || string.size() < 2) {
-		response = std::string(RED) +
-				   "Invalid command\r\nUsage: PRIVMSG <client to send message> <message>\r\n"
-				   + std::string(WHITE);
+		response = "Invalid command\r\nUsage: PRIVMSG <client to send message> <message>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	if (string[1] == "") {
 		std::cout << RED << "Error while sending message..." << WHITE << std::endl;
-		response = std::string(RED) + "The message must not be empty\r\n" + std::string(WHITE);
+		response = "The message must not be empty\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -38,14 +36,13 @@ void Server::pmsg(std::vector<std::string> string, int fd) {
 	Client* clientToReach = getClientByNick(string[0]);
 	if (clientToReach == NULL) {
 		std::cout << RED << "Error while sending message..." << WHITE << std::endl;
-		response = std::string(RED) + "This client does not exist\r\n" + std::string(WHITE);
+		response = "This client does not exist\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
 	std::string message = parseMessage(string);
-	response = std::string(BLUE) + "Private message from " +
-			   client->getNickname() + ": " + message + "\r\n" + std::string(WHITE);
+	response = "Private message from " + client->getNickname() + ": " + message + "\r\n";
 	send(clientToReach->getFd(), response.c_str(), response.size(), 0);
 	std::cout << YELLOW << "Sending message..." << WHITE << std::endl;
 }
