@@ -140,13 +140,13 @@ void Server::ReceiveNewData(int fd) {
 		close(fd); //-> close the client socket
 		return;
 	}
-	client->clientBuff.append(buff);
+	// client->clientBuff.append(buff);
 
-	if (client->clientBuff.find("\n") == std::string::npos)
-		return;
+	// if (client->clientBuff.find("\n") == std::string::npos)
+	// 	return;
 
 	if (buff[0] == '/')
-		Server::identifyCommand(client->clientBuff, fd);
+		Server::identifyCommand(buff, fd);
 	else
 		std::cout << "Client <" << fd << "> says: " << buff << std::endl;
 }
@@ -248,7 +248,7 @@ std::vector<std::string> splitstr(std::string string) {
 	return splittedStr;
 }
 
-void Server::identifyCommand(std::string& string, int fd)
+void Server::identifyCommand(std::string string, int fd)
 {
 	std::vector<std::string> splittedStr = splitstr(string);
 	Client* client = Server::getClientByFD(fd);
@@ -264,7 +264,6 @@ void Server::identifyCommand(std::string& string, int fd)
 							  "/quit",
 							  "/nickname",
 							  "/username"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
-
 	do {
 		int i = 0;
 		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));

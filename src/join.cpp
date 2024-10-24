@@ -51,6 +51,12 @@ void Server::join(std::vector<std::string> string, int fd) {
 		}
 	}
 
+	if (channel->isOnChannel(client->getNickname()) == true) {
+		response = std::string(RED) + "You are already on this channel" + std::string(WHITE);
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+	}
+
 	//verifica se o canal está cheio
 	if(channel->getClientCount() < channel->getLimit()) {
 		channel->addClient(client);

@@ -1,6 +1,6 @@
 #----SPECIFICS---------------------------------------------------------------------------------
 
-NAME = ft_irc
+NAME = ircserv
 SRC = main.cpp Server.cpp Client.cpp Channel.cpp mode.cpp invite.cpp kick.cpp topic.cpp\
 		join.cpp channelMsg.cpp exit.cpp help.cpp pmsg.cpp quit.cpp nickname.cpp username.cpp
 

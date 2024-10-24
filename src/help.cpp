@@ -2,7 +2,7 @@
 
 void Server::help(std::vector<std::string> string, int fd) {
 	std::string response;
-	if (string.size() > 0) {
+	if (string.size() > 1) {
 		response = std::string(RED) + "Too many arguments\r\nUsage: /help\r\n" + std::string(WHITE);
 		send(fd, response.c_str(), response.size(), 0);
 		return;

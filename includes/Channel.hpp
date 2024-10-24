@@ -15,8 +15,8 @@ class Channel {
 		int								_limit;
 		int								_clientCount;
 		std::vector<std::string>		_inviteList;
-		std::map<std::string, Client*>	_clients;
-		std::map<std::string, Client*>	_operators;
+		std::vector<Client*>			_clients;
+		std::vector<Client*>			_operators;
 
 	public:
 		Channel(const std::string& name);
@@ -39,21 +39,18 @@ class Channel {
 		int								getClientCount() const;
 		std::vector<Client*>			getAllClients() const;
 		std::string						getAllModes() const;
-		std::map<std::string, Client*>	getOperators() const;
-		std::map<std::string, Client*>	getNonOperators() const;
-		std::string						getChannelClientsList() const;
+		std::vector<Client*>			getOperators() const;
+		std::vector<Client*>			getNonOperators() const;
 
 		bool							isInvited(const std::string nickname) const;
 		bool							isOperator(const std::string nickname) const;
 		bool							isOnChannel(const std::string nickname) const;
 		void							addClient(Client* client);
-		bool							removeClient(const std::string& nickname);
+		void							removeClient(const std::string& nickname);
 		void							addToInviteList(const std::string nickname);
 		void 							removeFromInviteList(const std::string nickname);
 		void							promoteToOperator(std::string nickname);
 		void							demoteFromOperator(std::string nickname);
-		void							listClients() const;
-		void							listOperators() const;
 };
 
 #endif
