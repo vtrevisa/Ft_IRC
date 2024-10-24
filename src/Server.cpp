@@ -89,6 +89,9 @@ void Server::AcceptNewClient() {
 
 	cli.SetFd(incofd); //-> set the client file descriptor
 	cli.setIpAdd(inet_ntoa((cliadd.sin_addr))); //-> convert the ip address to string and set it
+	std::stringstream ss;
+	ss << cli.getFd();
+	cli.setNickname("Client" + ss.str());
 	_clients.push_back(cli); //-> add the client to the vector of clients
 	_fds.push_back(NewPoll); //-> add the client socket to the pollfd
 
