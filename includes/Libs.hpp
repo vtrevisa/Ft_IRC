@@ -54,7 +54,7 @@
 # define RPL_ENDOFWHO std::string(" :End of /WHO list ")
 # define RPL_NOTOPIC std::string(" :No topic is set ")
 # define RPL_ENDOFNAMES std::string(" :End of /NAMES list")
-# define RPL_WELCOME std::string(" :Welcome to the Internet Relay Chat ")
+# define RPL_WELCOME std::string(" :Welcome to IRCSERV")
 
 //error messages
 # define ERR_ACCEPT std::string(" Error on accept ")

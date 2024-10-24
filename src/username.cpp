@@ -10,26 +10,24 @@ void Server::username(std::vector<std::string> string, int fd) {
 
 	for (std::vector<Client*>::iterator it = clients.begin(); it != clients.end(); ++it) {
 		if ((*it)->getClientname() == username) {
-			std::cout << RED << "Error while setting username..." << WHITE << std::endl;
-			response = "This username is already in use\r\n";
+			std::cout << RED << "Error setting username..." << WHITE << std::endl;
+			response = IRC + ERR_ALREADYREGISTEREDNBR + client->getNickname() + ERR_ALREADYREGISTERED + END;
 			send(fd, response.c_str(), response.size(), 0);
 			return;
 		}
 	}
 
-	if (!client->getClientname().empty()){
-		response = "You have already set a username\r\n";
-		std::cout << RED << "Error while setting username..." << WHITE << std::endl;
+	if (!client->getClientname().empty()) {
+		std::cout << RED << "Error setting username..." << WHITE << std::endl;
+		response =	IRC + ERR_ALREADYREGISTEREDNBR + client->getNickname() + ERR_ALREADYREGISTERED + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
-	response = "Your username has been set to: " + username + "\r\n";
-	send(fd, response.c_str(), response.size(), 0);
 	client->setClientname(username);
 	
 	if(client->isAuth() == true) {
 		std::cout << YELLOW << "Setting username..." << WHITE << std::endl;
-		response =	"Welcome to IRCSERV!!\r\n";
+		response = IRC + RPL_WELCOMENBR + client->getNickname() + RPL_WELCOME + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
