@@ -141,13 +141,23 @@ void Server::ReceiveNewData(int fd) {
 		return;
 	}
 
+	if (buff[bytes - 1] != 10)
+	{
+		client->clientBuff.append(buff);
+	}
+	else
+	{
+		client->clientBuff.append(buff);
+		std::cout << "Buff to commands: " << client->clientBuff << std::endl;
+		identifyCommand(client->clientBuff, fd);
+	}
+	
 	// client->clientBuff.append(buff);
 
 	// if (client->clientBuff.find("\n") == std::string::npos)
 	// 	return;
 
 	// if (buff[0] == '/')
-	identifyCommand(buff, fd);
 	// else
 	// 	std::cout << "Client <" << fd << "> says: " << buff << std::endl;
 }
