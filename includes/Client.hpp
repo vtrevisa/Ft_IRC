@@ -21,6 +21,8 @@ class Client //-> class for client
 	public:
 		Client(); //-> default constructor
 		~Client();
+		Client(const Client& other); // Copy constructor
+		Client& operator=(const Client& other); // Copy assignment operator
 
 		std::string	clientBuff;
 

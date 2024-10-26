@@ -49,6 +49,7 @@
 # define ERR_BADCHANNELKEYNBR std::string(" 475 ")
 # define ERR_BADCHANMASKNBR std::string(" 476 ")
 # define ERR_CHANOPRIVSNEEDEDNBR std::string(" 482 ")
+# define ERR_CANNOTSENDTOCHAN std::string(" 404 ")
 
 //reply messages
 # define RPL_ENDOFWHO std::string(" :End of /WHO list ")

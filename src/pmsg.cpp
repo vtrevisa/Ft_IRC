@@ -1,4 +1,16 @@
 #include "../includes/Server.hpp"
+bool isClientInChannel(Client* client, Channel* channel) {
+	if (channel == NULL || client == NULL) {
+		return false;
+	}
+	std::vector<Client*> clients = channel->getAllClients();
+	for (size_t i = 0; i < clients.size() && clients[i] != NULL; i++) {
+		if (clients[i]->getFd() == client->getFd()) {
+			return true;
+		}
+	}
+	return false;
+}
 
 std::string parseMessage(std::vector<std::string> string) {
 	std::string message;
@@ -17,6 +29,10 @@ std::string parseMessage(std::vector<std::string> string) {
 void Server::pmsg(std::vector<std::string> string, int fd) {
 	std::string response;
 	Client* client = getClientByFD(fd);
+	if (client == NULL) {
+		std::cout << RED << "Error: Client not found..." << WHITE << std::endl;
+		return;
+	}
 	std::string channelName = string[0].substr(0, string[0].find(' '));
 
 	if (string.size() < 1 || channelName.empty()) {
@@ -51,6 +67,13 @@ void Server::pmsg(std::vector<std::string> string, int fd) {
 		std::cout << YELLOW << "Sending message..." << WHITE << std::endl;
 		response = ":" + client->getNickname() + " PRIVMSG " + toReach->getNickname() + " :" + message + END;
 		send(toReach->getFd(), response.c_str(), response.size(), 0);
+		return;
+	}
+
+	if (!isClientInChannel(client, channel)) {
+		std::cout << RED << "Error sending message..." << WHITE << std::endl;
+		response = IRC + ERR_CANNOTSENDTOCHAN + channelName + " :Cannot send to channel" + END;
+		send(fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
