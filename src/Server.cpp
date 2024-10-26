@@ -92,7 +92,8 @@ void Server::AcceptNewClient() {
 	// std::stringstream ss;
 	// ss << cli.getFd();
 	// cli.setNickname("Client" + ss.str());
-	_clients.push_back(cli); //-> add the client to the vector of clients
+	Client* newClient = new Client(cli);
+	_clients.push_back(*newClient); //-> add the client to the vector of clients
 	_fds.push_back(NewPoll); //-> add the client socket to the pollfd
 
 	std::cout << YELLOW << "Client <" << incofd << "> requested connection" << WHITE << std::endl; // Accept the client
@@ -324,7 +325,7 @@ void Server::identifyCommand(std::string string, int fd)
 				break;
 			case 5:
 				quit(fd);
-				break;
+				return;
 			case 6:
 				pmsg(parseCommand(parsedCommand), fd);
 				break;
@@ -350,7 +351,8 @@ void Server::identifyCommand(std::string string, int fd)
 		splittedStr.erase(splittedStr.begin());
 	} while (!splittedStr.empty());
 
-	client->clientBuff.clear();
+	if (client && !client->clientBuff.empty()) //-> clear the buffer
+		client->clientBuff.clear();
 }
 
 std::vector<std::string> Server::parseCommand(std::string string) {

@@ -56,7 +56,11 @@ void Server::pmsg(std::vector<std::string> string, int fd) {
 
 	std::cout << YELLOW << "Sending message..." << WHITE << std::endl;
 	response = ":" + client->getNickname() + " PRIVMSG " + channelName + " :" + message + END;
+	channel->removeDuplicateClientsByFD();
 	std::vector<Client*> clients = channel->getAllClients();
 	for (size_t i = 0; i < clients.size(); i++)
+	{
+		if (clients[i]->getFd() != fd)
 			send(clients[i]->getFd(), response.c_str(), response.size(), 0);
+	}
 }

@@ -51,6 +51,7 @@ class Channel {
 		void 							removeFromInviteList(const std::string nickname);
 		void							promoteToOperator(std::string nickname);
 		void							demoteFromOperator(std::string nickname);
+		void							removeDuplicateClientsByFD();
 };
 
 #endif

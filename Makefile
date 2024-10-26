@@ -1,30 +1,32 @@
 #----SPECIFICS---------------------------------------------------------------------------------
 
-NAME = ircserv
-SRC = main.cpp Server.cpp Client.cpp Channel.cpp mode.cpp invite.cpp kick.cpp topic.cpp\
+NAME	= ircserv
+SRC		= main.cpp Server.cpp Client.cpp Channel.cpp mode.cpp invite.cpp kick.cpp topic.cpp\
 		join.cpp part.cpp pmsg.cpp quit.cpp nickname.cpp username.cpp pass.cpp cap.cpp
+PORT	= 4444
+PASS	= 222
 
 #----DIRS--------------------------------------------------------------------------------------
-OBJ_DIR = obj
-SRC_DIR = src
-INC_DIR = includes
-VPATH = ./src
+OBJ_DIR	= obj
+SRC_DIR	= src
+INC_DIR	= includes
+VPATH	= ./src
 
 #----FLAGS-------------------------------------------------------------------------------------
 
-CC = c++
-CFLAGS = -g -Wall -Wextra -Werror -std=c++98 -I $(INC_DIR)
+CC		= c++
+CFLAGS	= -g -Wall -Wextra -Werror -std=c++98 -I $(INC_DIR)
 
 #----OBECTS------------------------------------------------------------------------------------
 
-OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
+OBJ		= $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
 
 #----FUNCTIONS----------------------------------------------------------------------------------
 
 all: $(NAME)
 
 v: all
-	valgrind --leak-check=full ./$(NAME)
+	valgrind --leak-check=full ./$(NAME) $(PORT) $(PASS)
 
 $(NAME): $(OBJ)
 	@c++ $(CFLAGS) $(OBJ) -o $@

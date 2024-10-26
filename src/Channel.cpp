@@ -174,3 +174,18 @@ void Channel::demoteFromOperator(const std::string nickname) {
 		if (_clients[i]->getNickname() == nickname)
 			_operators.erase(_clients.begin() + i);
 }
+
+void Channel::removeDuplicateClientsByFD() {
+	std::map<int, Client*> fdToClientMap;
+	std::vector<Client*> uniqueClients;
+
+	for (size_t i = 0; i < _clients.size(); ++i) {
+		int fd = _clients[i]->getFd();
+		if (fdToClientMap.find(fd) == fdToClientMap.end()) {
+			fdToClientMap[fd] = _clients[i];
+			uniqueClients.push_back(_clients[i]);
+		}
+	}
+
+	_clients = uniqueClients;
+}
