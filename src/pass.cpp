@@ -1,13 +1,13 @@
 #include "../includes/Server.hpp"
 
-void Server::pass(std::vector<std::string> string, int fd) {
+bool Server::pass(std::vector<std::string> string, int fd) {
     Client* client = getClientByFD(fd);
 	std::string response;
 	
 	if(string.size() == 0 || string[0] == "PASS" || string.size() != 1) {
 		response = "Invalid\r\nUsage: PASS <password>\r\n";
 		send(fd, response.c_str(), response.size(), 0);
-		return;
+		return false;
 	}
 
     std::string receivedPassword = string[0];
@@ -23,5 +23,7 @@ void Server::pass(std::vector<std::string> string, int fd) {
 		send(client->getFd(), response.c_str(), response.size(), 0);
 		close(client->getFd());
 		ClearClients(client->getFd());
+		return true;
 	}
+	return false;
 }

@@ -348,8 +348,9 @@ void Server::identifyCommand(std::string string, int fd)
 				cap(fd);
 				break;
 			case 11:
-				pass(parseCommand(parsedCommand), fd);
-				return;
+				if (pass(parseCommand(parsedCommand), fd) == true)
+					return;
+				break;
 			default:
 				unknownCommand(command, fd);
 				break;

@@ -61,7 +61,7 @@ class Server //-> class for server
 		void						nickname(std::vector<std::string> nick, int fd); //done
 		void						username(std::vector<std::string> string, int fd); //done
 		void						cap(int fd); //done
-		void						pass(std::vector<std::string> string, int fd); //done
+		bool						pass(std::vector<std::string> string, int fd); //done
 };
 
 #endif
