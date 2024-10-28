@@ -245,9 +245,8 @@ bool Server::channelExists(std::string& channelName) {
     return false;
 }
 
-void Server::createChannel(std::string channelName, int fd) {
+void Server::createChannel(std::string channelName) {
 	Channel newChannel(channelName);
-	newChannel.promoteToOperator(fd);
 	_channels.push_back(newChannel);
 }
 

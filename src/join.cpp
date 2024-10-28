@@ -43,7 +43,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 		}
 
 		if (!channelExists(channels[i])) {
-			createChannel(channels[i], fd);
+			createChannel(channels[i]);
 			isOperator = true;
 		}
 

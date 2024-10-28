@@ -41,7 +41,7 @@ class Server //-> class for server
 		std::vector<Client*>		getAllClients();
 
 		bool						channelExists(std::string &channelName);
-		void						createChannel(std::string channelName, int fd);
+		void						createChannel(std::string channelName);
 		void						deleteChannel(std::string channelName);
 
 		void						identifyCommand(std::string string, int fd);
