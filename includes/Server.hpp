@@ -26,7 +26,6 @@ class Server //-> class for server
 		void						ServerInit(int port, std::string passwd); //-> server initialization
 		void						SerSocket(); //-> server socket creation
 		void						AcceptNewClient(); //-> accept new client
-		// void						Authentication(Client* client); //-> authenticate the client
 		void						ReceiveNewData(int fd); //-> receive new data from a registered client
 
 		static void					SignalHandler(int signum); //-> signal handler

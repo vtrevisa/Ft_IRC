@@ -21,8 +21,6 @@ void Server::ServerInit(int port, std::string passwd) {
 			if (_fds[i].revents & POLLIN) { //-> check if there is data to read
 				if (_fds[i].fd == _SerSocketFd)
 					AcceptNewClient(); //-> accept new client
-				// else if (getClientByFD(_fds[i].fd)->getStatus() == UNAUTHORIZED)
-				// 	Authentication(getClientByFD(_fds[i].fd)); //-> authenticate the client
 				else
 					ReceiveNewData(_fds[i].fd); //-> receive new data from a registered client
 			}
@@ -89,42 +87,11 @@ void Server::AcceptNewClient() {
 
 	cli.SetFd(incofd); //-> set the client file descriptor
 	cli.setIpAdd(inet_ntoa((cliadd.sin_addr))); //-> convert the ip address to string and set it
-	// std::stringstream ss;
-	// ss << cli.getFd();
-	// cli.setNickname("Client" + ss.str());
 	_clients.push_back(cli); //-> add the client to the vector of clients
 	_fds.push_back(NewPoll); //-> add the client socket to the pollfd
 
 	std::cout << YELLOW << "Client <" << incofd << "> requested connection" << WHITE << std::endl; // Accept the client
 }
-
-// void Server::Authentication(Client* client)
-// {
-// 	char buffer[1024];
-// 	memset(buffer, 0, sizeof(buffer));
-
-// 	ssize_t bytes = recv(client->getFd(), buffer, sizeof(buffer) - 1, 0);
-// 	if (bytes <= 0) {
-// 		std::cerr << "Error receiving password from client" << std::endl;
-// 		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHITE << std::endl;
-// 		return;
-// 	}
-
-// 	std::string receivedPassword(buffer);
-// 	receivedPassword = receivedPassword.substr(0, receivedPassword.find(10));
-// 	if (receivedPassword == this->_passwd) {
-// 		client->setStatus(CONNECTED);
-// 		std::cout << GREEN << "Client <" << client->getFd() << "> Connected!" << WHITE << std::endl;
-// 		std::string response = "Password accepted!\r\n";
-// 		send(client->getFd(), response.c_str(), response.size(), 0);
-// 	} else {
-// 		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHITE << std::endl;
-// 		std::string response = "Password incorrect!\r\n";
-// 		send(client->getFd(), response.c_str(), response.size(), 0);
-// 		close(client->getFd());
-// 		ClearClients(client->getFd());
-// 	}
-// }
 
 void Server::ReceiveNewData(int fd) {
 	char buff[1024]; //-> buffer for the received data
@@ -151,15 +118,6 @@ void Server::ReceiveNewData(int fd) {
 		std::cout << "Buff to commands: " << client->clientBuff << std::endl;
 		identifyCommand(client->clientBuff, fd);
 	}
-	
-	// client->clientBuff.append(buff);
-
-	// if (client->clientBuff.find("\n") == std::string::npos)
-	// 	return;
-
-	// if (buff[0] == '/')
-	// else
-	// 	std::cout << "Client <" << fd << "> says: " << buff << std::endl;
 }
 
 bool Server::_Signal = false; //-> initialize the static boolean
@@ -294,7 +252,6 @@ void Server::identifyCommand(std::string string, int fd)
 		std::cout << string << std::endl;
 		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));
 		std::cout << string << std::endl;
-		//loop que vai identificar o comando
 		for (; i < 12; i++)
 			if(command == requests[i])
 				break;

@@ -129,8 +129,7 @@ bool Channel::isOnChannel(const std::string nickname) const {
 }
 
 void Channel::addClient(Client* client) {
-	Client* newClient = new Client(*client);
-	_clients.push_back(newClient);
+	_clients.push_back(client);
 	increaseClientCount();
 }
 
