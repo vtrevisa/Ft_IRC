@@ -42,7 +42,7 @@ void Server::topic(std::vector<std::string> string, int fd) {
 	std::string topic = parseTopic(string);
 	if (topic == "") {
 		if(channel->getTopic().empty()) {
-			std::cout << RED << "Error quitting channel..." << WHITE << std::endl;
+			std::cout << RED << "Error setting channel topic..." << WHITE << std::endl;
 			response = IRC + RPL_NOTOPICNBR + client->getNickname() + " " + channelName + RPL_NOTOPIC + END;
 			send (fd, response.c_str(), response.size(), 0);
 			return;
@@ -54,9 +54,15 @@ void Server::topic(std::vector<std::string> string, int fd) {
 		return;
 
 	} else {
-		if(channel->getMode("t") == true && !channel->isOperator(client->getNickname())) {
+		if (!channel->isOperator(client->getNickname())) {
 			std::cout << RED << "Topic not changed..." << WHITE << std::endl;
 			response = IRC + ERR_CHANOPRIVSNEEDEDNBR + client->getNickname() + " " + channelName + ERR_CHANOPRIVSNEEDED + END;
+			send(fd, response.c_str(), response.size(), 0);
+			return;
+		}
+		if(channel->getMode("t") == true) {
+			std::cout << RED << "Topic not changed..." << WHITE << std::endl;
+			response = IRC + ERR_CHANOPRIVSNEEDEDNBR + client->getNickname() + " " + channelName + ERR_CHANOPRIVSNEEDED2 + END;
 			send(fd, response.c_str(), response.size(), 0);
 			return;
 		}

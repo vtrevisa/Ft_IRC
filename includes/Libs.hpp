@@ -65,6 +65,7 @@
 # define ERR_BIND std::string(" Error on bind ")
 # define ERR_CHANNELISFULL std::string(" :Cannot join channel (+l) ")
 # define ERR_CHANOPRIVSNEEDED std::string(" :You're not channel operator ")
+# define ERR_CHANOPRIVSNEEDED2 std::string(" :Topic change locked ")
 # define ERR_ERRONEUSNICKNAME std::string(" :Erroneus nickname ")
 # define ERR_FCNTL std::string(" Error on fcntl ")
 # define ERR_INVITEONLYCHAN std::string(" :Cannot join channel (+i) ")
