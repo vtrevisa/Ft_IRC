@@ -49,9 +49,10 @@ class Channel {
 		void							removeClient(const std::string& nickname);
 		void							addToInviteList(const std::string nickname);
 		void 							removeFromInviteList(const std::string nickname);
-		void							promoteToOperator(std::string nickname);
-		void							demoteFromOperator(std::string nickname);
+		void							promoteToOperator(int fd);
+		void							demoteFromOperator(int fd);
 		void							removeDuplicateClientsByFD();
+		std::vector<int>				getFdClientList() const;
 };
 
 #endif

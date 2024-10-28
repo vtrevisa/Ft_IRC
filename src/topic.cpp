@@ -55,7 +55,7 @@ void Server::topic(std::vector<std::string> string, int fd) {
 
 	} else {
 		if(channel->getMode("t") == true && !channel->isOperator(client->getNickname())) {
-			std::cout << RED << "Error quitting channel..." << WHITE << std::endl;
+			std::cout << RED << "Topic not changed..." << WHITE << std::endl;
 			response = IRC + ERR_CHANOPRIVSNEEDEDNBR + client->getNickname() + " " + channelName + ERR_CHANOPRIVSNEEDED + END;
 			send(fd, response.c_str(), response.size(), 0);
 			return;

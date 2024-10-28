@@ -43,7 +43,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 		}
 
 		if (!channelExists(channels[i])) {
-			createChannel(channels[i]);
+			createChannel(channels[i], fd);
 			isOperator = true;
 		}
 
@@ -74,7 +74,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 		}
 
 		if(channel->getClientCount() < channel->getLimit()) {
-			channel->addClient(client);
+			channel->addClient(client); //client added here
 		} else {
 			std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
 			response = IRC + ERR_CHANNELISFULLNBR + channels[i] + " " + channels[i] + ERR_CHANNELISFULL + END;
@@ -82,7 +82,7 @@ void Server::join(std::vector<std::string> string, int fd) {
 			continue;
 		}
 		if (isOperator) {
-			channel->promoteToOperator(client->getNickname());
+			channel->promoteToOperator(fd);
 		}
 		
 		std::cout << YELLOW << "Joining channel..." << WHITE << std::endl;

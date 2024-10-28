@@ -1,11 +1,11 @@
 #include "../includes/Server.hpp"
-bool isClientInChannel(Client* client, Channel* channel) {
-	if (channel == NULL || client == NULL) {
+bool isClientInChannel(int clientFd, Channel* channel) {
+	if (channel == NULL) {
 		return false;
 	}
-	std::vector<Client*> clients = channel->getAllClients();
-	for (size_t i = 0; i < clients.size() && clients[i] != NULL; i++) {
-		if (clients[i]->getFd() == client->getFd()) {
+	std::vector<int> clientFds = channel->getFdClientList();
+	for (size_t i = 0; i < clientFds.size(); i++) {
+		if (clientFds[i] == clientFd) {
 			return true;
 		}
 	}
@@ -70,7 +70,7 @@ void Server::pmsg(std::vector<std::string> string, int fd) {
 		return;
 	}
 
-	if (!isClientInChannel(client, channel)) {
+	if (!isClientInChannel(fd, channel)) {
 		std::cout << RED << "Error sending message..." << WHITE << std::endl;
 		response = IRC + ERR_CANNOTSENDTOCHAN + channelName + " :Cannot send to channel" + END;
 		send(fd, response.c_str(), response.size(), 0);

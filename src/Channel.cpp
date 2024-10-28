@@ -111,13 +111,10 @@ bool Channel::isInvited(const std::string nickname) const {
 }
 
 bool Channel::isOperator(const std::string nickname) const {
-	bool isOperator = false;
-
-	for (size_t i = 0; i < _clients.size(); i++)
-		if (nickname == _clients[i]->getNickname())
-			isOperator = true;
-
-    return isOperator;
+	for (size_t i = 0; i < _operators.size(); i++)
+		if (nickname == _operators[i]->getNickname())
+			return true;
+	return false;
 }
 
 bool Channel::isOnChannel(const std::string nickname) const {
@@ -132,7 +129,8 @@ bool Channel::isOnChannel(const std::string nickname) const {
 }
 
 void Channel::addClient(Client* client) {
-	_clients.push_back(client);
+	Client* newClient = new Client(*client);
+	_clients.push_back(newClient);
 	increaseClientCount();
 }
 
@@ -163,16 +161,17 @@ void Channel::removeFromInviteList(const std::string nickname) {
     }
 }
 
-void Channel::promoteToOperator(const std::string nickname) {
+void Channel::promoteToOperator(int fd) {
 	for (size_t i = 0; i < _clients.size(); ++i)
-		if (_clients[i]->getNickname() == nickname)
+		if (_clients[i]->getFd() == fd)
 			_operators.push_back(_clients[i]);
+
 }
 
-void Channel::demoteFromOperator(const std::string nickname) {
+void Channel::demoteFromOperator(int fd) {
 	for (size_t i = 0; i < _clients.size(); ++i)
-		if (_clients[i]->getNickname() == nickname)
-			_operators.erase(_clients.begin() + i);
+		if (_clients[i]->getFd() == fd)
+			_operators.erase(std::remove(_operators.begin(), _operators.end(), _clients[i]), _operators.end());
 }
 
 void Channel::removeDuplicateClientsByFD() {
@@ -188,4 +187,12 @@ void Channel::removeDuplicateClientsByFD() {
 	}
 
 	_clients = uniqueClients;
+}
+
+std::vector<int> Channel::getFdClientList() const {
+	std::vector<int> fdList;
+	for (size_t i = 0; i < _clients.size(); ++i) {
+		fdList.push_back(_clients[i]->getFd());
+	}
+	return fdList;
 }

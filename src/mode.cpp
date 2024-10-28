@@ -119,7 +119,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 			if (!channel->isOnChannel(clientArg->getNickname()) || !channel->isOperator(clientArg->getNickname()))
 				return;
 
-			channel->demoteFromOperator(clientArg->getNickname());
+			channel->demoteFromOperator(clientArg->getFd());
 			response += "-o";
 			break;
 
@@ -141,7 +141,7 @@ void Server::mode(std::vector<std::string> string, int fd) {
 			if (!channel->isOnChannel(clientArg->getNickname()) || channel->isOperator(clientArg->getNickname())) 
 				return;
 
-			channel->promoteToOperator(clientArg->getNickname());
+			channel->promoteToOperator(clientArg->getFd());
 			response += "+o";
 			break;
 

@@ -31,4 +31,9 @@ void	Server::nickname(std::vector<std::string> nick, int fd)
 		client->setNickname(nick[0]);
 		send(fd, response.c_str(), response.size(), 0);
 	}
+	if(client->isAuth() == true) {
+		response = IRC + RPL_WELCOMENBR + client->getNickname() + RPL_WELCOME + END;
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+	}
 }
