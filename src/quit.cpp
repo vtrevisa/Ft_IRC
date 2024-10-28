@@ -9,7 +9,7 @@ void	Server::quit(int fd) {
 		std::vector<Client*> clients = (*chanIt)->getAllClients();
 		for (std::vector<Client*>::iterator clientIt = clients.begin(); clientIt != clients.end(); ++clientIt) {
 			if ((*clientIt)->getFd() == fd) {
-				(*chanIt)->removeClient(client->getNickname());
+				(*chanIt)->removeClient(client->getFd());
 				break;
 			}
 		}

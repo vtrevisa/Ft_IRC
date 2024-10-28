@@ -30,7 +30,7 @@ void Server::part(const std::vector<std::string> string, int fd) {
 			for (size_t i = 0; i < clients.size(); i++)
 				send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 		}
-		channel->removeClient(client->getNickname());
+		channel->removeClient(client->getFd());
 
 		if (channel->getAllClients().size() == 0)
 			deleteChannel(channelName);

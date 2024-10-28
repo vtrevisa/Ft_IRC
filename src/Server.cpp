@@ -92,8 +92,7 @@ void Server::AcceptNewClient() {
 	// std::stringstream ss;
 	// ss << cli.getFd();
 	// cli.setNickname("Client" + ss.str());
-	Client* newClient = new Client(cli);
-	_clients.push_back(*newClient); //-> add the client to the vector of clients
+	_clients.push_back(cli); //-> add the client to the vector of clients
 	_fds.push_back(NewPoll); //-> add the client socket to the pollfd
 
 	std::cout << YELLOW << "Client <" << incofd << "> requested connection" << WHITE << std::endl; // Accept the client
@@ -171,6 +170,13 @@ void Server::SignalHandler(int signum) {
 }
 
 void Server::CloseFds() {
+	for (size_t i = 0; i < _channels.size(); i++) {
+		std::vector<Client*> clients = _channels[i].getAllClients();
+		for (size_t j = 0; j < clients.size(); j++) {
+			delete clients[j];
+		}
+	}
+	_channels.clear();
 	for(size_t i = 0; i < _clients.size(); i++) { //-> close all the clients
 		std::cout << RED << "Client <" << _clients[i].getFd() << "> Disconnected" << WHITE << std::endl;
 		close(_clients[i].getFd());

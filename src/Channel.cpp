@@ -134,18 +134,21 @@ void Channel::addClient(Client* client) {
 	increaseClientCount();
 }
 
-void Channel::removeClient(const std::string& nickname) {
-	// std::vector<Client*> clientList = getAllClients();
+void Channel::removeClient(int fd) {
 	for (size_t i = 0; i < _clients.size(); ++i) {
-		if (_clients[i]->getNickname() == nickname) {
+		if (_clients[i]->getFd() == fd) {
 			_clients.erase(_clients.begin() + i);
 			decreaseClientCount();
+			break;
 		}
 	}
 
-	for (size_t i = 0; i < _operators.size(); ++i)
-		if (_operators[i]->getNickname() == nickname)
+	for (size_t i = 0; i < _operators.size(); ++i) {
+		if (_operators[i]->getFd() == fd) {
 			_operators.erase(_operators.begin() + i);
+			break;
+		}
+	}
 }
 
 void Channel::addToInviteList(const std::string nickname) {

@@ -46,7 +46,7 @@ class Channel {
 		bool							isOperator(const std::string nickname) const;
 		bool							isOnChannel(const std::string nickname) const;
 		void							addClient(Client* client);
-		void							removeClient(const std::string& nickname);
+		void							removeClient(const int fd);
 		void							addToInviteList(const std::string nickname);
 		void 							removeFromInviteList(const std::string nickname);
 		void							promoteToOperator(int fd);
