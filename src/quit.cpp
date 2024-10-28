@@ -14,7 +14,9 @@ void	Server::quit(int fd) {
 			}
 		}
 	}
-
+	for (size_t i = 0; i < _channels.size(); i++) {
+		_channels[i].removeClient(fd);
+	}
 	std::cout << RED << "Client <" << client->getNickname() << "> Disconnected" << WHITE << std::endl;
 	close(fd);
 	ClearClients(fd);

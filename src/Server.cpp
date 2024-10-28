@@ -350,7 +350,7 @@ void Server::identifyCommand(std::string string, int fd)
 				break;
 			case 11:
 				pass(parseCommand(parsedCommand), fd);
-				break;
+				return;
 			default:
 				unknownCommand(command, fd);
 				break;

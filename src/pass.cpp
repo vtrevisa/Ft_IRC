@@ -1,7 +1,7 @@
 #include "../includes/Server.hpp"
 
 void Server::pass(std::vector<std::string> string, int fd) {
-    Client* client = Server::getClientByFD(fd);
+    Client* client = getClientByFD(fd);
 	std::string response;
 	
 	if(string.size() == 0 || string[0] == "PASS" || string.size() != 1) {
@@ -23,6 +23,5 @@ void Server::pass(std::vector<std::string> string, int fd) {
 		send(client->getFd(), response.c_str(), response.size(), 0);
 		close(client->getFd());
 		ClearClients(client->getFd());
-		delete client;
 	}
 }
