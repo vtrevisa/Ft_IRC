@@ -128,12 +128,6 @@ void Server::SignalHandler(int signum) {
 }
 
 void Server::CloseFds() {
-	for (size_t i = 0; i < _channels.size(); i++) {
-		std::vector<Client*> clients = _channels[i].getAllClients();
-		for (size_t j = 0; j < clients.size(); j++) {
-			delete clients[j];
-		}
-	}
 	_channels.clear();
 	for(size_t i = 0; i < _clients.size(); i++) { //-> close all the clients
 		std::cout << RED << "Client <" << _clients[i].getFd() << "> Disconnected" << WHITE << std::endl;
