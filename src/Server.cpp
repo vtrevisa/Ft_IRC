@@ -21,8 +21,6 @@ void Server::ServerInit(int port, std::string passwd) {
 			if (_fds[i].revents & POLLIN) { //-> check if there is data to read
 				if (_fds[i].fd == _SerSocketFd)
 					AcceptNewClient(); //-> accept new client
-				else if (getClientByFD(_fds[i].fd)->getStatus() == UNAUTHORIZED)
-					Authentication(getClientByFD(_fds[i].fd)); //-> authenticate the client
 				else
 					ReceiveNewData(_fds[i].fd); //-> receive new data from a registered client
 			}
@@ -69,6 +67,7 @@ void Server::SerSocket() {
 void Server::AcceptNewClient() {
 	Client cli; //-> create a new client
 	struct sockaddr_in cliadd;
+	std::memset(&cliadd, 0, sizeof(cliadd));
 	struct pollfd NewPoll;
 	socklen_t len = sizeof(cliadd);
 
@@ -93,37 +92,6 @@ void Server::AcceptNewClient() {
 	_fds.push_back(NewPoll); //-> add the client socket to the pollfd
 
 	std::cout << YELLOW << "Client <" << incofd << "> requested connection" << WHITE << std::endl; // Accept the client
-	std::string passwordRequest = "Please enter the password:\r\n";
-	send(incofd, passwordRequest.c_str(), passwordRequest.size(), 0);
-}
-
-void Server::Authentication(Client* client)
-{
-	char buffer[1024];
-	memset(buffer, 0, sizeof(buffer));
-
-	ssize_t bytes = recv(client->getFd(), buffer, sizeof(buffer) - 1, 0);
-	if (bytes <= 0) {
-		std::cerr << "Error receiving password from client" << std::endl;
-		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHITE << std::endl;
-		return;
-	}
-
-	std::string receivedPassword(buffer);
-	receivedPassword = receivedPassword.substr(0, receivedPassword.find(10));
-
-	if (receivedPassword == this->_passwd) {
-		client->setStatus(CONNECTED);
-		std::cout << GREEN << "Client <" << client->getFd() << "> Connected!" << WHITE << std::endl;
-		std::string response = "Password accepted!\r\n";
-		send(client->getFd(), response.c_str(), response.size(), 0);
-	} else {
-		std::cout << RED << "Client <" << client->getFd() << "> Disconnected" << WHITE << std::endl;
-		std::string response = "Password incorrect!\r\n";
-		send(client->getFd(), response.c_str(), response.size(), 0);
-		close(client->getFd());
-		ClearClients(client->getFd());
-	}
 }
 
 void Server::ReceiveNewData(int fd) {
@@ -138,17 +106,20 @@ void Server::ReceiveNewData(int fd) {
 		client->clientBuff.clear();
 		ClearClients(fd); //-> clear the client
 		close(fd); //-> close the client socket
+		fd = -1;
 		return;
 	}
-	client->clientBuff.append(buff);
 
-	if (client->clientBuff.find("\n") == std::string::npos)
-		return;
-
-	if (buff[0] == '/')
-		Server::identifyCommand(client->clientBuff, fd);
+	if (buff[bytes - 1] != 10)
+	{
+		client->clientBuff.append(buff);
+	}
 	else
-		std::cout << "Client <" << fd << "> says: " << buff << std::endl;
+	{
+		client->clientBuff.append(buff);
+		// std::cout << "Buff to commands: " << client->clientBuff << std::endl;
+		identifyCommand(client->clientBuff, fd);
+	}
 }
 
 bool Server::_Signal = false; //-> initialize the static boolean
@@ -159,14 +130,23 @@ void Server::SignalHandler(int signum) {
 }
 
 void Server::CloseFds() {
+	// for (size_t i = 0; i < _channels.size(); i++) {
+	// 	std::deque<Client*> clients = _channels[i].getAllClients();
+	// 	for (size_t j = 0; j < clients.size(); j++) {
+	// 		delete clients[j];
+	// 	}
+	// }
 	for(size_t i = 0; i < _clients.size(); i++) { //-> close all the clients
 		std::cout << RED << "Client <" << _clients[i].getFd() << "> Disconnected" << WHITE << std::endl;
 		close(_clients[i].getFd());
+		_clients[i].SetFd(-1);
 	}
 	if (_SerSocketFd != -1) { //-> close the server socket
 		std::cout << RED << "Server <" << _SerSocketFd << "> Disconnected" << WHITE << std::endl;
 		close(_SerSocketFd);
+		_SerSocketFd = -1;
 	}
+	_channels.clear();
 }
 
 void Server::ClearClients(int fd) { //-> clear the clients
@@ -199,22 +179,29 @@ Client* Server::getClientByNick(std::string nickName) {
 }
 
 Channel* Server::getChannel(const std::string& channelName) {
-    for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
+    for (std::deque<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
         if (it->getName() == channelName)
             return &(*it);
 	}
 	return NULL;
 }
 
-std::vector<Client*> Server::getAllClients() {
-	std::vector<Client*> clientList;
+std::deque<Channel*> Server::getAllChannels() {
+	std::deque<Channel*> channelList;
+	for (size_t i = 0; i < _channels.size(); ++i)
+		channelList.push_back(&_channels[i]);
+	return channelList;
+}
+
+std::deque<Client*> Server::getAllClients() {
+	std::deque<Client*> clientList;
 	for (size_t i = 0; i < _clients.size(); ++i)
 		clientList.push_back(&_clients[i]);
 	return clientList;
 }
 
 bool Server::channelExists(std::string& channelName) {
-    for (std::vector<Channel>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
+    for (std::deque<Channel>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
         if (it->getName() == channelName)
             return true;
     return false;
@@ -237,8 +224,8 @@ void Server::deleteChannel(std::string channelName) {
 	}
 }
 
-std::vector<std::string> splitstr(std::string string) {
-	std::vector<std::string> splittedStr;
+std::deque<std::string> splitstr(std::string string) {
+	std::deque<std::string> splittedStr;
 	std::string word;
 	std::stringstream ss(string);
 
@@ -248,40 +235,43 @@ std::vector<std::string> splitstr(std::string string) {
 	return splittedStr;
 }
 
-void Server::identifyCommand(std::string& string, int fd)
+void Server::identifyCommand(std::string string, int fd)
 {
-	std::vector<std::string> splittedStr = splitstr(string);
-	Client* client = Server::getClientByFD(fd);
-	std::string requests[] = {"/mode",
-							  "/invite",
-							  "/topic",
-							  "/kick",
-							  "/join",
-							  "/channel",
-							  "/exit",
-							  "/help",
-							  "/pmsg",
-							  "/quit",
-							  "/nickname",
-							  "/username"}; //aqui entra nossa cadeia de comandos possiveis, exemplo {"KICK", "JOIN"}
-
+	std::deque<std::string> splittedStr = splitstr(string);
+	Client* client = getClientByFD(fd);
+	std::string requests[] = {"MODE",
+							  "INVITE",
+							  "TOPIC",
+							  "KICK",
+							  "JOIN",
+							  "QUIT",
+							  "PRIVMSG",
+							  "PART",
+							  "NICK",
+							  "USER",
+							  "CAP",
+							  "PASS"};
 	do {
 		int i = 0;
+		std::cout << string << std::endl;
 		std::string command = splittedStr[0].substr(0, splittedStr[0].find_first_of(" "));
-
-		//loop que vai identificar o comando
-		for (; i < 12; i++) //substituir XXXX pelo numero de comandos totais descritos acima
+		for (; i < 12; i++)
 			if(command == requests[i])
 				break;
-
+	
+		Client* client = getClientByFD(fd);
+		if(client->isAuth() == false) {
+			if (i != 8 && i != 9 && i != 10 && i != 11) {
+				std::cout << i << std::endl;
+				std::string response = "You have not registered\r\n";
+				send(fd, response.c_str(), response.size(), 0);
+				client->clientBuff.clear();
+				return;
+			}
+		}
 
 		std::string parsedCommand = splittedStr[0].substr(splittedStr[0].find_first_of(" ") + 1);
 
-		//cada comando vai ser um case diferente, então é só chamar o método correspondente em cada caso
-		//ex: case 0:
-		//kick(parseCommand(parsedCommand), ...); break;
-		//case 1:
-		//join(parseCommand(parsedCommand), ...); break;
 		std::string response;
 		switch (i) {
 			case 0:
@@ -300,25 +290,27 @@ void Server::identifyCommand(std::string& string, int fd)
 				join(parseCommand(parsedCommand), fd);
 				break;
 			case 5:
-				channelMsg(parseCommand(parsedCommand), fd);
-				break;
+				quit(fd);
+				return;
 			case 6:
-				exit(parseCommand(parsedCommand), fd);
-				break;
-			case 7:
-				help(parseCommand(parsedCommand), fd);
-				break;
-			case 8:
+				std::cout << "CHAMOU NOIS!" << std::endl;
 				pmsg(parseCommand(parsedCommand), fd);
 				break;
-			case 9:
-				quit(parseCommand(parsedCommand), fd);
+			case 7:
+				part(parseCommand(parsedCommand), fd);
 				break;
-			case 10:
+			case 8:
 				nickname(parseCommand(parsedCommand), fd);
 				break;
-			case 11:
+			case 9:
 				username(parseCommand(parsedCommand), fd);
+				break;
+			case 10:
+				cap(fd);
+				break;
+			case 11:
+				if (pass(parseCommand(parsedCommand), fd) == true)
+					return;
 				break;
 			default:
 				unknownCommand(command, fd);
@@ -327,25 +319,42 @@ void Server::identifyCommand(std::string& string, int fd)
 		splittedStr.erase(splittedStr.begin());
 	} while (!splittedStr.empty());
 
-	client->clientBuff.clear();
+	if (client && !client->clientBuff.empty()) //-> clear the buffer
+		client->clientBuff.clear();
 }
 
-std::vector<std::string> Server::parseCommand(std::string string) {
+std::deque<std::string> Server::parseCommand(std::string string) {
 	std::string word;
 	std::stringstream ss(string);
-	std::vector<std::string> splittedVector;
+	std::deque<std::string> splittedVector;
+	bool insideQuotes = false;
+	std::string temp;
 
-	while (std::getline(ss, word, ' ')) {
-		if (word.find('\r') != std::string::npos)
-			splittedVector.push_back(word.substr(0, word.find('\r')));
-		else
+	if (string.empty()) {
+		splittedVector.push_back("");
+		return splittedVector;
+	}
+
+	while (ss >> word) {
+		if (word[0] == '"' && !insideQuotes) {
+			insideQuotes = true;
+			temp = word.substr(1);
+		} else if (insideQuotes) {
+			temp += " " + word;
+			if (word[word.size() - 1] == '"') {
+				insideQuotes = false;
+				temp = temp.substr(0, temp.size() - 1);
+				splittedVector.push_back(temp);
+				temp.clear();
+			}
+		} else
 			splittedVector.push_back(word);
 	}
+
 	if (splittedVector.size() == 0)
 		splittedVector.push_back("");
 
 	return splittedVector;
-
 }
 
 void Server::unknownCommand(std::string command, int fd) {

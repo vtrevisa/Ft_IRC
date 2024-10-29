@@ -1,72 +1,70 @@
 #include "../includes/Server.hpp"
 
-void Server::kick(std::vector<std::string> string, int fd) {
+void Server::kick(std::deque<std::string> string, int fd) {
+	Client* client = getClientByFD(fd);
 	std::string response;
 
-	//verifica se os parametros estão vazios
-	if (string.size() == 0 || string[0] == "" || string.size() > 3) {
-		response = std::string(RED) + "Invalid number of arguments\r\n" +
-				   "Usage: /kick <client to be kicked> <channel name> (optional)<reason in double quotes>\r\n"
-				   + std::string(WHITE);
+    if (string.size() == 0 || string[0] == "") {
+		std::cout << RED << "Error kicking client from channel..." << WHITE << std::endl;
+		response = IRC + ERR_NEEDMOREPARAMSNBR + " KICK " + ERR_NEEDMOREPARAMS + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
-	}
+    }
 
-	Client* client = getClientByFD(fd);
-	Channel* channel = getChannel(string[1]);
-	const std::string& channelName = string[1];
-
-	//verifica se o canal existe
-	if (channel == NULL) {
-		response = std::string(RED) + "Channel does not exist\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	//verifica se o client que chamou o comando está no canal
-	if (!channel->isOnChannel(client->getNickname())) {
-		response = std::string(RED) + "You must be on the channel to use kick command\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	//verifica se o client que chamou o comando é operador no canal
-	if (!channel->isOperator(client->getNickname())) {
-		response = std::string(RED) + "You don't have operator privileges on this channel\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	//verifica se o client a ser expulso existe
-	Client* kickedClient = getClientByNick(string[0]);
-	if (kickedClient == NULL) {
-		response = std::string(RED) + "This client does not exist\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	//verifica se o client a ser expulso esta no canal
-	if (!channel->isOnChannel(kickedClient->getNickname())) {
-		response = std::string(RED) + "This client is not on this channel\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	//verifica se existe uma razão para a expulsão
 	std::string reason;
+    const std::string& channelName = string[0];
+	
 	if (string.size() == 3)
 		reason = string[2].substr(1);
 	else
 		reason = "no reason";
 
-	channel->removeClient(kickedClient->getNickname());
+    Channel* channel = getChannel(channelName);
+    if (channel == NULL) {
+		std::cout << RED << "Error kicking client from channel..." << WHITE << std::endl;
+		response = IRC + ERR_NOSUCHCHANNELNBR + channelName + " " + channelName + ERR_NOSUCHCHANNEL + END;
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+    }
 
-	int kickedClientFD = kickedClient->getFd();
-	response = std::string(YELLOW) + "You were kicked from the channel " + channelName + "\r\nReason: " + reason + "\r\n";
-	send(kickedClientFD, response.c_str(), response.size(), 0);
+    if (!channel->isOperator(client->getNickname())) {
+		std::cout << RED << "Error kicking client from channel..." << WHITE << std::endl;
+		response = IRC + ERR_CHANOPRIVSNEEDEDNBR + client->getNickname() + " " + channelName + ERR_CHANOPRIVSNEEDED + END;
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+    }
 
-	std::vector<Client *> clients = channel->getAllClients();
-	response = std::string(YELLOW) + "#" + channel->getName() + ": " + client->getNickname() + " has been kicked from this channel\r\nReason: " + reason + "\r\n";
-	for (size_t i = 0; i < clients.size(); i++)
-		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
+	std::istringstream iss(string[1]);
+	std::string KickedClientNick;
+	while (std::getline(iss, KickedClientNick, ',')) {
+		Client* kickedClient = getClientByNick(KickedClientNick);
+		if (kickedClient == NULL) {
+			std::cout << RED << "Error kicking client from channel..." << WHITE << std::endl;
+			response = IRC + ERR_NOSUCHNICKNBR + " " + channelName + " " + KickedClientNick + ERR_NOSUCHNICK + END;
+			send(fd, response.c_str(), response.size(), 0);
+			continue;
+		}
+
+		if (!channel->isOnChannel(KickedClientNick)) {
+			std::cout << RED << "Error kicking client from channel..." << WHITE << std::endl;
+			response = IRC + ERR_USERNOTINCHANNELNBR + channelName + " " + KickedClientNick + " " + channelName + ERR_USERNOTINCHANNEL + END;
+			send(fd, response.c_str(), response.size(), 0);
+			continue;
+		}
+
+		if (!channel->isOperator(client->getNickname())) {
+			std::cout << RED << "Error kicking client from channel..." << WHITE << std::endl;
+			response = IRC + ERR_CHANOPRIVSNEEDEDNBR + client->getNickname() + " " + channelName + ERR_CHANOPRIVSNEEDED + END;
+			send(fd, response.c_str(), response.size(), 0);
+			return;
+		}
+
+		std::cout << YELLOW << "Kicking client from channel..." << WHITE << std::endl;
+		response = ":" + client->getNickname() + "!" + client->getClientname() + "@ft.irc KICK " + channelName + " " + KickedClientNick + " :"+ reason + END;
+		std::deque<Client*> clients = channel->getAllClients();
+		for (size_t i = 0; i < clients.size(); i++)
+			send(clients[i]->getFd(), response.c_str(), response.size(), 0);
+		int kickedClientFd = kickedClient->getFd();
+		channel->removeClient(kickedClientFd);
+	}
 }

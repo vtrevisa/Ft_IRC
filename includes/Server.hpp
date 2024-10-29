@@ -15,9 +15,9 @@ class Server //-> class for server
 		int							_Port; //-> server port
 		int							_SerSocketFd; //-> server socket file descriptor
 		static bool					_Signal; //-> static boolean for signal
-		std::vector<Client>			_clients; //-> vector of clients
-		std::vector<struct pollfd>	_fds; //-> vector of pollfd
-		std::vector<Channel>		_channels;
+		std::deque<Client>			_clients; //-> vector of clients
+		std::deque<struct pollfd>	_fds; //-> vector of pollfd
+		std::deque<Channel>		_channels;
 
 	public:
 		Server(); //-> default constructor
@@ -26,7 +26,6 @@ class Server //-> class for server
 		void						ServerInit(int port, std::string passwd); //-> server initialization
 		void						SerSocket(); //-> server socket creation
 		void						AcceptNewClient(); //-> accept new client
-		void						Authentication(Client* client); //-> authenticate the client
 		void						ReceiveNewData(int fd); //-> receive new data from a registered client
 
 		static void					SignalHandler(int signum); //-> signal handler
@@ -37,29 +36,31 @@ class Server //-> class for server
 		Client*						getClientByFD(int fd);
 		Client*						getClientByNick(std::string nickname);
 		Channel*					getChannel(const std::string& channelName);
-		std::vector<Client*>		getAllClients();
+		std::deque<Channel*>		getAllChannels();
+		std::deque<Client*>		getAllClients();
 
 		bool						channelExists(std::string &channelName);
 		void						createChannel(std::string channelName);
 		void						deleteChannel(std::string channelName);
 
-		void						identifyCommand(std::string& string, int fd);
-		std::vector<std::string>	parseCommand(std::string string);
+		void						identifyCommand(std::string string, int fd);
+		std::deque<std::string>	parseCommand(std::string string);
 		void						unknownCommand(std::string command, int fd);
 
 		//comandos
-		void						mode(std::vector<std::string> string, int fd); //done
-		void						invite(std::vector<std::string> string, int fd); //done
-		void						topic(std::vector<std::string> string, int fd); //done
-		void						kick(std::vector<std::string> string, int fd); //done
-		void						join(std::vector<std::string> string, int fd); //done
-		void						channelMsg(std::vector<std::string> string, int fd); //done
-		void						exit(std::vector<std::string> string, int fd); //done
-		void						help(std::vector<std::string> string, int fd); //done
-		void						pmsg(std::vector<std::string> string, int fd); //done
-		void						quit(std::vector<std::string> string, int fd); //done
-		void						nickname(std::vector<std::string> nick, int fd);
-		void						username(std::vector<std::string> string, int fd); //done
+		void						mode(std::deque<std::string> string, int fd); //done
+		void						invite(std::deque<std::string> string, int fd); //done
+		void						topic(std::deque<std::string> string, int fd); //done
+		void						kick(std::deque<std::string> string, int fd); //done
+		void						join(std::deque<std::string> string, int fd); //done
+		void						quit(int fd); //done
+		void						help(std::deque<std::string> string, int fd); //done
+		void						pmsg(std::deque<std::string> string, int fd); //done
+		void						part(std::deque<std::string> string, int fd); //done
+		void						nickname(std::deque<std::string> nick, int fd); //done
+		void						username(std::deque<std::string> string, int fd); //done
+		void						cap(int fd); //done
+		bool						pass(std::deque<std::string> string, int fd); //done
 };
 
 #endif

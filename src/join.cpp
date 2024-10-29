@@ -1,73 +1,97 @@
 #include "../includes/Server.hpp"
 
-void Server::join(std::vector<std::string> string, int fd) {
-	std::string response;
+static void splitString(std::string& str, char delimiter, std::deque<std::string>& tokens) {
+	std::stringstream ss(str);
+	std::string token;
+	while (!ss.eof() && std::getline(ss, token, delimiter))
+		tokens.push_back(token);
+}
 
-	if (string.size() == 0 || string[0] == "" || string.size() > 2) {
-		response = std::string(RED) + 
-				   "Invalid number of arguments\r\nUsage: /join <channel name> (optional)<password>\r\n"
-				   + std::string(WHITE);
+static bool isValidChannelName(const std::string& channelName) {
+    if (channelName.empty() || channelName[0] != '#')
+        return false;
+    return true;
+}
+
+void Server::join(std::deque<std::string> string, int fd) {
+	bool isOperator = false;
+
+	std::string response;
+	std::deque<std::string> channels;
+
+	if (string[0].empty() || (string.size() > 1 && string[1].empty())) {
+		std::cout << RED << "Error joining channel..." << WHITE << std::endl;
+		response = IRC + ERR_NEEDMOREPARAMSNBR + " JOIN " + ERR_NEEDMOREPARAMS + END;
 		send(fd, response.c_str(), response.size(), 0);
 		return;
+    }
+
+	splitString(string[0], ',', channels);
+
+    std::deque<std::string> passwords;
+    if (string.size() > 1) {
+        splitString(string[1], ',', passwords);
 	}
 
 	Client* client = getClientByFD(fd);
-	Channel* channel = getChannel(string[0]);
-	const std::string& channelName = string[0];
-	bool owner = false;
-	//verifica se o canal existe e se não existir, cria
-	if (channel == NULL) {
-		createChannel(channelName);
-		channel = getChannel(string[0]);
-		owner = true;
-	}
+	for (size_t i = 0; i < channels.size(); i++) {
+		if (!isValidChannelName(channels[i])) {
+			std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
+			response = IRC + ERR_BADCHANMASKNBR + channels[i] + ERR_BADCHANMASK + END;
+			send(fd, response.c_str(), response.size(), 0);
+			continue;
+		}
 
-	if (channel->getMode("i") == true) {
-		if (channel->isInvited(client->getNickname()) || channel->isOnChannel(client->getNickname())) {
-			if (channel->isInvited(client->getNickname()))
+		if (!channelExists(channels[i])) {
+			createChannel(channels[i]);
+			isOperator = true;
+		}
+
+		Channel* channel = getChannel(channels[i]);
+		if (channel->getMode("i") == true) {
+			if (!channel->isInvited(client->getNickname())) {
+				std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
+				response = IRC + ERR_INVITEONLYCHANNBR + channels[i] + " " + channels[i] + ERR_INVITEONLYCHAN + END;
+				send(fd, response.c_str(), response.size(), 0);
+				continue;
+			} else {
 				channel->removeFromInviteList(client->getNickname());
+			}
+		}
+
+		std::string password = channel->getPassword();
+		if (!password.empty() && passwords.size() < i + 1) {
+			std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
+			response = IRC + ERR_BADCHANNELKEYNBR + channels[i] + " " + channels[i] + ERR_BADCHANNELKEY + END;
+			send(fd, response.c_str(), response.size(), 0);
+			continue;
+		}
+		if (!password.empty() && password != passwords[i]) {
+			std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
+			response = IRC + ERR_PASSWDMISMATCHNBR + channels[i] + ERR_PASSWDMISMATCH + END;
+			send(fd, response.c_str(), response.size(), 0);
+			continue;
+		}
+
+		if(channel->getClientCount() < channel->getLimit()) {
+			channel->addClient(client); //client added here
 		} else {
-			response = std::string(RED) + "You have not been invited for this channel\r\n" + std::string(WHITE);
+			std::cout << RED << "Error while joining channel..." << WHITE << std::endl;
+			response = IRC + ERR_CHANNELISFULLNBR + channels[i] + " " + channels[i] + ERR_CHANNELISFULL + END;
 			send(fd, response.c_str(), response.size(), 0);
-			return;
+			continue;
 		}
-	}
-
-	std::string channelPassword = channel->getPassword();
-	//verifica se o canal possui senha
-	if (!channelPassword.empty() && string.size() == 1) {
-		response = std::string(RED) + "You must provide a password to join this channel\r\n" + std::string(WHITE);
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	if (!channelPassword.empty()) {
-		std::string password = string[1];
-		//verifica se a senha é a correta
-		if (!channelPassword.empty() && channelPassword != password) {
-			response = std::string(RED) + "Wrong password\r\n" + std::string(WHITE);
-			send(fd, response.c_str(), response.size(), 0);
-			return;
+		if (isOperator) {
+			channel->promoteToOperator(fd);
 		}
-	}
-
-	//verifica se o canal está cheio
-	if(channel->getClientCount() < channel->getLimit()) {
-		channel->addClient(client);
-	} else {
-		response = std::string(RED) + "You cannot join this channel\r\nThis channel has reached the client limit\r\n" 
-				   + std::string(WHITE);
+		
+		std::cout << YELLOW << "Joining channel..." << WHITE << std::endl;
+		std::string response = ":" + client->getNickname() + " JOIN " + channels[i] + END;
 		send(fd, response.c_str(), response.size(), 0);
-		return;
+
+		if (!channel->getTopic().empty()) {
+            response = channels[i] + " :" + channel->getTopic() + "\r\n";
+            send(fd, response.c_str(), response.size(), 0);
+        }
 	}
-
-	if (owner)
-		channel->promoteToOperator(client->getNickname());
-
-	std::vector<Client *> clients = channel->getAllClients();
-	response = std::string(YELLOW) + "#" + channel->getName() + ": " +
-			   client->getNickname() + " has joined this channel\r\n" +
-			   std::string(WHITE);
-	for (size_t i = 0; i < clients.size(); i++)
-		send(clients[i]->getFd(), response.c_str(), response.size(), 0);
 }

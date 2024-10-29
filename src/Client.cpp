@@ -4,6 +4,27 @@ Client::Client() : _status(UNAUTHORIZED){}
 
 Client::~Client() {}
 
+Client::Client(const Client& other) {
+	_clientname = other._clientname;
+	_nickname = other._nickname;
+	_IPadd = other._IPadd;
+	_Fd = other._Fd;
+	_password = other._password;
+	_status = other._status;
+}
+
+Client& Client::operator=(const Client& other) {
+	if (this != &other) {
+		_clientname = other._clientname;
+		_nickname = other._nickname;
+		_IPadd = other._IPadd;
+		_Fd = other._Fd;
+		_password = other._password;
+		_status = other._status;
+	}
+	return *this;
+}
+
 void Client::setClientname(std::string clientname) {
 	_clientname = clientname;
 }
@@ -49,4 +70,10 @@ std::string Client::getPassword() {
 
 status Client::getStatus() {
 	return _status;
+}
+
+bool Client::isAuth() {
+	if(this->_clientname.empty() || this->_nickname.empty() || this->_password.empty())
+		return false;
+	return true;
 }

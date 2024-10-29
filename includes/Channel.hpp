@@ -14,9 +14,9 @@ class Channel {
 		std::map<std::string, bool>		_modes;
 		int								_limit;
 		int								_clientCount;
-		std::vector<std::string>		_inviteList;
-		std::map<std::string, Client*>	_clients;
-		std::map<std::string, Client*>	_operators;
+		std::deque<std::string>		_inviteList;
+		std::deque<Client*>			_clients;
+		std::deque<Client*>			_operators;
 
 	public:
 		Channel(const std::string& name);
@@ -37,23 +37,22 @@ class Channel {
 		bool							getMode(std::string mode) const;
 		int								getLimit() const;
 		int								getClientCount() const;
-		std::vector<Client*>			getAllClients() const;
+		std::deque<Client*>			getAllClients() const;
 		std::string						getAllModes() const;
-		std::map<std::string, Client*>	getOperators() const;
-		std::map<std::string, Client*>	getNonOperators() const;
-		std::string						getChannelClientsList() const;
+		std::deque<Client*>			getOperators() const;
+		std::deque<Client*>			getNonOperators() const;
 
 		bool							isInvited(const std::string nickname) const;
 		bool							isOperator(const std::string nickname) const;
 		bool							isOnChannel(const std::string nickname) const;
 		void							addClient(Client* client);
-		bool							removeClient(const std::string& nickname);
+		void							removeClient(const int fd);
 		void							addToInviteList(const std::string nickname);
 		void 							removeFromInviteList(const std::string nickname);
-		void							promoteToOperator(std::string nickname);
-		void							demoteFromOperator(std::string nickname);
-		void							listClients() const;
-		void							listOperators() const;
+		void							promoteToOperator(int fd);
+		void							demoteFromOperator(int fd);
+		void							removeDuplicateClientsByFD();
+		std::deque<int>				getFdClientList() const;
 };
 
 #endif

@@ -1,52 +1,35 @@
 #include "../includes/Server.hpp"
 
-void Server::username(std::vector<std::string> string, int fd) {
+void Server::username(std::deque<std::string> string, int fd) {
+	Client* client = getClientByFD(fd);
+	if(client == NULL)
+		return;
+	std::deque<Client*> clients = getAllClients();
 	std::string response;
-	Client* client = Server::getClientByFD(fd);
-	//verifica se o cliente existe
-	if (client == NULL) {
-		response = "Client not found\r\n";
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
+	std::string username = string[0].substr(0, string[0].find(' '));
 
-	//verifica linha de comando passada
-	if (string.size() > 1) {
-		response = std::string(RED) + "Too many arguments\r\nUsage: /username (optional)<username>\r\n" + std::string(WHITE);
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	//verifica se foi passado um username
-	if (string.size() == 0 || string[0] == "") {
-		if (client->getClientname() == "")
-			response = std::string(YELLOW) + "You don't have a username yet\r\n" + std::string(WHITE);
-		else
-			response = std::string(YELLOW) + "Your username is " + client->getClientname() + "\r\n" + std::string(WHITE);
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	//verifica se o cliente já possui um username
-	if (!client->getClientname().empty()){
-		response =	std::string(RED) + "You have already set a username\r\n" + std::string(WHITE);
-		send(fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	std::vector<Client*> clients = getAllClients();
-	std::string username = string[0];
-
-	//verifica se o username escolhido já está em uso
-	for (std::vector<Client*>::iterator it = clients.begin(); it != clients.end(); ++it) {
+	for (std::deque<Client*>::iterator it = clients.begin(); it != clients.end(); ++it) {
 		if ((*it)->getClientname() == username) {
-			response = std::string(RED) + "This username is already in use\r\n" + std::string(WHITE);
+			std::cout << RED << "Error setting username..." << WHITE << std::endl;
+			response = IRC + ERR_ALREADYREGISTEREDNBR + client->getNickname() + ERR_ALREADYREGISTERED + END;
 			send(fd, response.c_str(), response.size(), 0);
 			return;
 		}
 	}
 
+	if (!client->getClientname().empty()) {
+		std::cout << RED << "Error setting username..." << WHITE << std::endl;
+		response =	IRC + ERR_ALREADYREGISTEREDNBR + client->getNickname() + ERR_ALREADYREGISTERED + END;
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+	}
+
+	std::cout << YELLOW << "Setting username..." << WHITE << std::endl;
 	client->setClientname(username);
-	response = std::string(YELLOW) + "Your username has been set to: " + username + "\r\n" + std::string(WHITE);
-	send(fd, response.c_str(), response.size(), 0);
+	
+	if(client->isAuth() == true) {
+		response = IRC + RPL_WELCOMENBR + client->getNickname() + RPL_WELCOME + END;
+		send(fd, response.c_str(), response.size(), 0);
+		return;
+	}
 }
