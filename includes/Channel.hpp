@@ -37,10 +37,10 @@ class Channel {
 		bool							getMode(std::string mode) const;
 		int								getLimit() const;
 		int								getClientCount() const;
-		std::deque<Client*>			getAllClients() const;
+		std::deque<Client*>				getAllClients() const;
 		std::string						getAllModes() const;
-		std::deque<Client*>			getOperators() const;
-		std::deque<Client*>			getNonOperators() const;
+		std::deque<Client*>				getOperators() const;
+		std::deque<Client*>				getNonOperators() const;
 
 		bool							isInvited(const std::string nickname) const;
 		bool							isOperator(const std::string nickname) const;
@@ -52,7 +52,7 @@ class Channel {
 		void							promoteToOperator(int fd);
 		void							demoteFromOperator(int fd);
 		void							removeDuplicateClientsByFD();
-		std::deque<int>				getFdClientList() const;
+		std::deque<int>					getFdClientList() const;
 };
 
 #endif

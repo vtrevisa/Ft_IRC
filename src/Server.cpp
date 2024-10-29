@@ -88,7 +88,7 @@ void Server::AcceptNewClient() {
 
 	cli.SetFd(incofd); //-> set the client file descriptor
 	cli.setIpAdd(inet_ntoa((cliadd.sin_addr))); //-> convert the ip address to string and set it
-	_clients.push_back(cli); //-> add the client to the vector of clients
+	_clients.push_back(cli); //-> add the client to the deque of clients
 	_fds.push_back(NewPoll); //-> add the client socket to the pollfd
 
 	std::cout << YELLOW << "Client <" << incofd << "> requested connection" << WHITE << std::endl; // Accept the client
@@ -156,7 +156,7 @@ void Server::ClearClients(int fd) { //-> clear the clients
 			break;
 		}
 	}
-	for(size_t i = 0; i < _clients.size(); i++) { //-> remove the client from the vector of clients
+	for(size_t i = 0; i < _clients.size(); i++) { //-> remove the client from the deque of clients
 		if (_clients[i].getFd() == fd) {
 			_clients.erase(_clients.begin() + i);
 			break;
@@ -262,7 +262,6 @@ void Server::identifyCommand(std::string string, int fd)
 		Client* client = getClientByFD(fd);
 		if(client->isAuth() == false) {
 			if (i != 8 && i != 9 && i != 10 && i != 11) {
-				std::cout << i << std::endl;
 				std::string response = "You have not registered\r\n";
 				send(fd, response.c_str(), response.size(), 0);
 				client->clientBuff.clear();
@@ -293,7 +292,6 @@ void Server::identifyCommand(std::string string, int fd)
 				quit(fd);
 				return;
 			case 6:
-				std::cout << "CHAMOU NOIS!" << std::endl;
 				pmsg(parseCommand(parsedCommand), fd);
 				break;
 			case 7:
@@ -326,13 +324,13 @@ void Server::identifyCommand(std::string string, int fd)
 std::deque<std::string> Server::parseCommand(std::string string) {
 	std::string word;
 	std::stringstream ss(string);
-	std::deque<std::string> splittedVector;
+	std::deque<std::string> splitteddeque;
 	bool insideQuotes = false;
 	std::string temp;
 
 	if (string.empty()) {
-		splittedVector.push_back("");
-		return splittedVector;
+		splitteddeque.push_back("");
+		return splitteddeque;
 	}
 
 	while (ss >> word) {
@@ -344,17 +342,17 @@ std::deque<std::string> Server::parseCommand(std::string string) {
 			if (word[word.size() - 1] == '"') {
 				insideQuotes = false;
 				temp = temp.substr(0, temp.size() - 1);
-				splittedVector.push_back(temp);
+				splitteddeque.push_back(temp);
 				temp.clear();
 			}
 		} else
-			splittedVector.push_back(word);
+			splitteddeque.push_back(word);
 	}
 
-	if (splittedVector.size() == 0)
-		splittedVector.push_back("");
+	if (splitteddeque.size() == 0)
+		splitteddeque.push_back("");
 
-	return splittedVector;
+	return splitteddeque;
 }
 
 void Server::unknownCommand(std::string command, int fd) {

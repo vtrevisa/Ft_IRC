@@ -15,9 +15,9 @@ class Server //-> class for server
 		int							_Port; //-> server port
 		int							_SerSocketFd; //-> server socket file descriptor
 		static bool					_Signal; //-> static boolean for signal
-		std::deque<Client>			_clients; //-> vector of clients
-		std::deque<struct pollfd>	_fds; //-> vector of pollfd
-		std::deque<Channel>		_channels;
+		std::deque<Client>			_clients; //-> deque of clients
+		std::deque<struct pollfd>	_fds; //-> deque of pollfd
+		std::deque<Channel>			_channels;
 
 	public:
 		Server(); //-> default constructor
@@ -37,14 +37,14 @@ class Server //-> class for server
 		Client*						getClientByNick(std::string nickname);
 		Channel*					getChannel(const std::string& channelName);
 		std::deque<Channel*>		getAllChannels();
-		std::deque<Client*>		getAllClients();
+		std::deque<Client*>			getAllClients();
 
 		bool						channelExists(std::string &channelName);
 		void						createChannel(std::string channelName);
 		void						deleteChannel(std::string channelName);
 
 		void						identifyCommand(std::string string, int fd);
-		std::deque<std::string>	parseCommand(std::string string);
+		std::deque<std::string>		parseCommand(std::string string);
 		void						unknownCommand(std::string command, int fd);
 
 		//comandos
